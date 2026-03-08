@@ -1,0 +1,1194 @@
+﻿@model MajhiPaithani.Web.ViewModels.Home.LandingPageViewModel
+@{
+    ViewData["Title"] = "Majhi Paithani";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --gold: #C9A84C;
+        --gold-light: #E8C96B;
+        --gold-pale: #F5E6B8;
+        --burgundy: #4A0E1A;
+        --deep: #1A0508;
+        --silk: #FDF6EC;
+        --text-dark: #1e1008;
+        --text-mid: #5a3a2a;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        background-color: var(--silk);
+        color: var(--text-dark);
+        overflow-x: hidden;
+    }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.4;
+        }
+
+    /* ══════════════════════════════
+           LANGUAGE TOGGLE
+        ══════════════════════════════ */
+    .lang-toggle {
+        position: fixed;
+        top: 20px;
+        right: 24px;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        background: rgba(26, 5, 8, 0.88);
+        border: 1px solid rgba(201, 168, 76, 0.45);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-radius: 2px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .lang-btn {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        padding: 11px 20px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.4);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+        .lang-btn.active {
+            background: var(--gold);
+            color: var(--deep);
+        }
+
+        .lang-btn:not(.active):hover {
+            color: var(--gold);
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+    .lang-sep {
+        width: 1px;
+        height: 16px;
+        background: rgba(201, 168, 76, 0.3);
+        flex-shrink: 0;
+    }
+
+    /* Fade-swap animation */
+    .lang-fade {
+        transition: opacity 0.25s ease;
+    }
+
+        .lang-fade.out {
+            opacity: 0;
+        }
+
+    /* ══════════════════════════════
+           HERO
+        ══════════════════════════════ */
+    .hero {
+        min-height: 100vh;
+        background: var(--deep);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .hero-mandala {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.06;
+    }
+
+        .hero-mandala svg {
+            width: min(90vw, 800px);
+            height: min(90vw, 800px);
+            animation: slowspin 80s linear infinite;
+        }
+
+    @@keyframes slowspin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .hero::before, .hero::after {
+        content: '';
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        border: 1px solid rgba(201,168,76,0.25);
+        border-radius: 50%;
+    }
+
+    .hero::before {
+        top: -80px;
+        left: -80px;
+    }
+
+    .hero::after {
+        bottom: -80px;
+        right: -80px;
+    }
+
+    .hero-inner {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 60px 24px;
+        max-width: 860px;
+    }
+
+    .hero-label {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 11px;
+        font-weight: 300;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: var(--gold);
+        display: block;
+        margin-bottom: 28px;
+        animation: fadeUp 1s ease both;
+    }
+
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(36px, 6vw, 76px);
+        font-weight: 900;
+        line-height: 1.1;
+        color: #fff;
+        animation: fadeUp 1s 0.15s ease both;
+    }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-light);
+            display: block;
+        }
+
+    .hero-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin: 32px auto;
+        animation: fadeUp 1s 0.3s ease both;
+    }
+
+        .hero-divider span {
+            display: block;
+            height: 1px;
+            width: 80px;
+            background: var(--gold);
+            opacity: 0.6;
+        }
+
+        .hero-divider i {
+            color: var(--gold);
+            font-size: 10px;
+        }
+
+    .hero p {
+        font-size: clamp(16px, 2.2vw, 21px);
+        color: rgba(255,255,255,0.65);
+        line-height: 1.8;
+        font-weight: 300;
+        font-style: italic;
+        max-width: 600px;
+        margin: 0 auto 48px;
+        animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeUp 1s 0.45s ease both;
+    }
+
+    .btn-gold {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        padding: 16px 44px;
+        background: var(--gold);
+        color: var(--deep);
+        border: none;
+        text-decoration: none;
+        font-weight: 400;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        display: inline-block;
+    }
+
+        .btn-gold::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold-light);
+            transform: translateX(-101%);
+            transition: transform 0.4s ease;
+        }
+
+        .btn-gold:hover::after {
+            transform: translateX(0);
+        }
+
+        .btn-gold span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-gold:hover {
+            color: var(--deep);
+        }
+
+    .btn-ghost {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        padding: 15px 44px;
+        background: transparent;
+        color: rgba(255,255,255,0.85);
+        border: 1px solid rgba(201,168,76,0.5);
+        text-decoration: none;
+        font-weight: 300;
+        transition: all 0.4s ease;
+        display: inline-block;
+    }
+
+        .btn-ghost:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201,168,76,0.07);
+        }
+
+    @@keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-scroll {
+        position: absolute;
+        bottom: 36px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        animation: fadeUp 1s 0.9s ease both;
+    }
+
+        .hero-scroll span {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+        }
+
+    .hero-scroll-line {
+        width: 1px;
+        height: 48px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+        animation: lineGrow 2s 1.5s ease infinite;
+    }
+
+    @@keyframes lineGrow {
+        0%, 100% {
+            opacity: 0;
+            transform: scaleY(0);
+            transform-origin: top;
+        }
+
+        50% {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+
+    /* ══════════════════════════════
+           SHARED
+        ══════════════════════════════ */
+    .section-wrap {
+        padding: 100px 24px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .section-eyebrow {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: var(--gold);
+        display: block;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(28px, 4vw, 46px);
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.25;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+    }
+
+    .section-lead {
+        text-align: center;
+        font-size: 19px;
+        color: var(--text-mid);
+        max-width: 620px;
+        margin: 0 auto 60px;
+        line-height: 1.9;
+        font-style: italic;
+        font-weight: 300;
+    }
+
+    .gold-rule {
+        width: 60px;
+        height: 2px;
+        background: var(--gold);
+        margin: 20px auto 40px;
+    }
+
+    /* ══════════════════════════════
+           PROBLEM
+        ══════════════════════════════ */
+    .problem-section {
+        background: var(--deep);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .problem-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .problem-section .section-title {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .problem-section .section-lead {
+            color: rgba(255,255,255,0.5);
+        }
+
+    .problem-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1px;
+        background: rgba(201,168,76,0.15);
+        border: 1px solid rgba(201,168,76,0.15);
+    }
+
+    .problem-card {
+        background: var(--deep);
+        padding: 48px 36px;
+        position: relative;
+        transition: background 0.4s;
+    }
+
+        .problem-card:hover {
+            background: #220a10;
+        }
+
+    .problem-card-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 72px;
+        font-weight: 900;
+        line-height: 1;
+        color: rgba(201,168,76,0.1);
+        position: absolute;
+        top: 20px;
+        right: 24px;
+    }
+
+    .problem-card-icon {
+        font-size: 28px;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .problem-card h4 {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gold-light);
+        margin-bottom: 12px;
+    }
+
+    .problem-card p {
+        font-size: 16px;
+        color: rgba(255,255,255,0.5);
+        line-height: 1.8;
+        font-weight: 300;
+    }
+
+    /* ══════════════════════════════
+           SOLUTION
+        ══════════════════════════════ */
+    .solution-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+    }
+
+    .solution-card {
+        border: 1px solid rgba(201,168,76,0.25);
+        padding: 44px 32px;
+        background: #fff;
+        position: relative;
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background: var(--gold);
+            transition: height 0.4s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 64px rgba(74,14,26,0.1);
+        }
+
+            .solution-card:hover::before {
+                height: 100%;
+            }
+
+        .solution-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--burgundy);
+            margin-bottom: 12px;
+        }
+
+        .solution-card p {
+            font-size: 16px;
+            color: var(--text-mid);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+    /* ══════════════════════════════
+           BENEFITS
+        ══════════════════════════════ */
+    .benefits-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+    }
+
+    @@media (max-width: 768px) {
+        .benefits-wrap {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .benefit-block-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(201,168,76,0.4);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .benefit-block-title .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+    .benefit-list {
+        list-style: none;
+    }
+
+        .benefit-list li {
+            font-size: 17px;
+            color: var(--text-mid);
+            padding: 14px 0 14px 28px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            line-height: 1.7;
+            position: relative;
+            font-weight: 300;
+            transition: color 0.3s, padding-left 0.3s;
+        }
+
+            .benefit-list li::before {
+                content: '→';
+                position: absolute;
+                left: 0;
+                color: var(--gold);
+                font-family: 'Josefin Sans';
+                font-size: 13px;
+                top: 16px;
+            }
+
+            .benefit-list li:hover {
+                color: var(--text-dark);
+                padding-left: 34px;
+            }
+
+    /* ══════════════════════════════
+           HOW IT WORKS
+        ══════════════════════════════ */
+    .works-section {
+        background: var(--burgundy);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .works-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .works-section .section-title {
+            color: #fff;
+        }
+
+        .works-section .section-lead {
+            color: rgba(255,255,255,0.5);
+        }
+
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0;
+        position: relative;
+    }
+
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 52px;
+            left: 12%;
+            right: 12%;
+            height: 1px;
+            background: rgba(201,168,76,0.2);
+        }
+
+    @@media (max-width: 640px) {
+        .steps-grid::before {
+            display: none;
+        }
+    }
+
+    .step {
+        text-align: center;
+        padding: 40px 24px;
+        position: relative;
+    }
+
+    .step-circle {
+        width: 64px;
+        height: 64px;
+        border: 1px solid var(--gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        color: var(--gold);
+        background: var(--burgundy);
+        position: relative;
+        z-index: 1;
+        transition: background 0.4s, color 0.4s;
+    }
+
+    .step:hover .step-circle {
+        background: var(--gold);
+        color: var(--deep);
+    }
+
+    .step h4 {
+        font-family: 'Playfair Display', serif;
+        font-size: 19px;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .step p {
+        font-size: 15px;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.7;
+        font-weight: 300;
+    }
+
+    /* ══════════════════════════════
+           CTA
+        ══════════════════════════════ */
+    .cta-section {
+        background: var(--deep);
+        position: relative;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .cta-bg-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(80px, 15vw, 180px);
+        font-weight: 900;
+        color: rgba(201,168,76,0.04);
+        white-space: nowrap;
+        pointer-events: none;
+        user-select: none;
+        letter-spacing: -4px;
+    }
+
+    .cta-section h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(28px, 4vw, 52px);
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.2;
+        position: relative;
+        z-index: 1;
+    }
+
+        .cta-section h2 em {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+    .cta-section p {
+        font-size: 19px;
+        color: rgba(255,255,255,0.5);
+        font-style: italic;
+        margin: 20px auto 44px;
+        max-width: 520px;
+        font-weight: 300;
+        line-height: 1.8;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ══════════════════════════════
+           FOOTER
+        ══════════════════════════════ */
+    .footer-bar {
+        background: #0e0204;
+        padding: 24px;
+        text-align: center;
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: rgba(255,255,255,0.2);
+        text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════
+           SCROLL REVEAL
+        ══════════════════════════════ */
+    .reveal {
+        opacity: 0;
+        transform: translateY(36px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+    .reveal-delay-1 {
+        transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+        transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+        transition-delay: 0.3s;
+    }
+</style>
+
+<!-- ══════════════════════════════════════════════
+     LANGUAGE TOGGLE (fixed top-right)
+══════════════════════════════════════════════ -->
+<div class="lang-toggle">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" id="btn-mr" onclick="setLang('mr')">मराठी</button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section class="hero lang-fade">
+    <div class="hero-mandala">
+        <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="250" cy="250" r="240" stroke="#C9A84C" stroke-width="0.5" />
+            <circle cx="250" cy="250" r="200" stroke="#C9A84C" stroke-width="0.5" />
+            <circle cx="250" cy="250" r="160" stroke="#C9A84C" stroke-width="0.5" />
+            <circle cx="250" cy="250" r="120" stroke="#C9A84C" stroke-width="0.5" />
+            <circle cx="250" cy="250" r="80" stroke="#C9A84C" stroke-width="0.5" />
+            <circle cx="250" cy="250" r="40" stroke="#C9A84C" stroke-width="0.5" />
+            <line x1="250" y1="10" x2="250" y2="490" stroke="#C9A84C" stroke-width="0.4" />
+            <line x1="10" y1="250" x2="490" y2="250" stroke="#C9A84C" stroke-width="0.4" />
+            <line x1="80" y1="80" x2="420" y2="420" stroke="#C9A84C" stroke-width="0.4" />
+            <line x1="420" y1="80" x2="80" y2="420" stroke="#C9A84C" stroke-width="0.4" />
+            <line x1="250" y1="10" x2="490" y2="250" stroke="#C9A84C" stroke-width="0.3" />
+            <line x1="490" y1="250" x2="250" y2="490" stroke="#C9A84C" stroke-width="0.3" />
+            <line x1="250" y1="490" x2="10" y2="250" stroke="#C9A84C" stroke-width="0.3" />
+            <line x1="10" y1="250" x2="250" y2="10" stroke="#C9A84C" stroke-width="0.3" />
+            <polygon points="250,30 470,180 470,320 250,470 30,320 30,180" stroke="#C9A84C" stroke-width="0.4" fill="none" />
+            <polygon points="250,80 430,180 430,320 250,420 70,320 70,180" stroke="#C9A84C" stroke-width="0.3" fill="none" />
+        </svg>
+    </div>
+
+    <div class="hero-inner">
+        <span class="hero-label"
+              data-en="Est. Maharashtra · Handcrafted Heritage"
+              data-mr="महाराष्ट्र · हस्तकला वारसा">
+            Est. Maharashtra · Handcrafted Heritage
+        </span>
+        <h1>
+            <span data-en="Authentic Paithani Sarees"
+                  data-mr="खस्सी पैठणी साड्या">Authentic Paithani Sarees</span>
+            <em data-en="Direct From Artisans"
+                data-mr="थेट विणकरांकडून">Direct From Artisans</em>
+        </h1>
+        <div class="hero-divider"><span></span><i>✦</i><span></span></div>
+        <p data-en="Connecting traditional Paithani artisans with customers without middlemen."
+           data-mr="पारंपरिक पैठणी विणकरांना थेट ग्राहकांशी जोडणे — कोणताही दलाल नाही.">
+            Connecting traditional Paithani artisans with customers without middlemen.
+        </p>
+        <div class="hero-cta">
+            <a href="/Account/Register" class="btn-gold">
+                <span data-en="Become a Seller"
+                      data-mr="विक्रेता व्हा">Become a Seller</span>
+            </a>
+            <a href="/Sarees" class="btn-ghost"
+               data-en="Explore Sarees"
+               data-mr="साड्या पहा">Explore Sarees</a>
+        </div>
+    </div>
+    <div class="hero-scroll">
+        <span data-en="Scroll" data-mr="खाली जा">Scroll</span>
+        <div class="hero-scroll-line"></div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     PROBLEM
+══════════════════════════════════════════════ -->
+<section class="problem-section lang-fade">
+    <div class="section-wrap">
+        <span class="section-eyebrow reveal"
+              data-en="The Challenge"
+              data-mr="समस्या">The Challenge</span>
+        <h2 class="section-title reveal"
+            data-en="Problem With The Traditional Market"
+            data-mr="पारंपरिक बाजारपेठेतील समस्या">
+            Problem With The Traditional Market
+        </h2>
+        <div class="gold-rule reveal"></div>
+        <p class="section-lead reveal"
+           data-en="In traditional Paithani saree sales, artisans rarely meet customers directly. Multiple middlemen increase the price while artisans receive less profit."
+           data-mr="पारंपरिक पैठणी विक्रीत विणकर क्वचितच थेट ग्राहकांना भेटतात. अनेक दलाल किंमत वाढवतात आणि विणकरांना कमी नफा मिळतो.">
+            In traditional Paithani saree sales, artisans rarely meet customers directly.
+            Multiple middlemen increase the price while artisans receive less profit.
+        </p>
+
+        <div class="problem-cards">
+            <div class="problem-card reveal reveal-delay-1">
+                <span class="problem-card-num">01</span>
+                <span class="problem-card-icon">⛓</span>
+                <h4 data-en="Middlemen Control Pricing"
+                    data-mr="दलाल किंमत ठरवतात">
+                    Middlemen Control Pricing
+                </h4>
+                <p data-en="Prices inflate as each layer adds margin — customers pay more, artisans earn less."
+                   data-mr="प्रत्येक स्तरावर नफा जोडला जातो — ग्राहक जास्त देतात, विणकर कमी कमावतात.">
+                    Prices inflate as each layer adds margin — customers pay more, artisans earn less.
+                </p>
+            </div>
+            <div class="problem-card reveal reveal-delay-2">
+                <span class="problem-card-num">02</span>
+                <span class="problem-card-icon">🪡</span>
+                <h4 data-en="Artisans Get Low Profit"
+                    data-mr="विणकरांना कमी नफा">
+                    Artisans Get Low Profit
+                </h4>
+                <p data-en="The real creators of Paithani — whose hands weave every thread — receive a fraction."
+                   data-mr="पैठणीचे खरे निर्माते — ज्यांच्या हातांनी प्रत्येक धागा विणला जातो — त्यांना फक्त एक छोटासा वाटा मिळतो.">
+                    The real creators of Paithani — whose hands weave every thread — receive a fraction.
+                </p>
+            </div>
+            <div class="problem-card reveal reveal-delay-3">
+                <span class="problem-card-num">03</span>
+                <span class="problem-card-icon">🔇</span>
+                <h4 data-en="No Direct Communication"
+                    data-mr="थेट संवाद नाही">
+                    No Direct Communication
+                </h4>
+                <p data-en="Customers cannot speak with the artisan for customization, story, or trust."
+                   data-mr="ग्राहक विणकराशी थेट बोलू शकत नाहीत — अनुकूलन, कथा किंवा विश्वासासाठी नाही.">
+                    Customers cannot speak with the artisan for customization, story, or trust.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SOLUTION
+══════════════════════════════════════════════ -->
+<section class="lang-fade" style="background: var(--silk);">
+    <div class="section-wrap">
+        <span class="section-eyebrow reveal"
+              data-en="Our Solution"
+              data-mr="आमचे उत्तर">Our Solution</span>
+        <h2 class="section-title reveal"
+            data-en="A Direct Bridge Between Artisan &amp; Customer"
+            data-mr="विणकर आणि ग्राहक यांच्यातील थेट सेतू">
+            A Direct Bridge Between Artisan &amp; Customer
+        </h2>
+        <div class="gold-rule reveal"></div>
+        <p class="section-lead reveal"
+           data-en="Majhi Paithani removes every barrier between creator and connoisseur. No middlemen. Transparent pricing. Real connection."
+           data-mr="माझी पैठणी निर्माता आणि रसिक यांच्यातील प्रत्येक अडथळा दूर करते. कोणता दलाल नाही. पारदर्शक किंमत. खरा संवाद.">
+            Majhi Paithani removes every barrier between creator and connoisseur.
+            No middlemen. Transparent pricing. Real connection.
+        </p>
+
+        <div class="solution-cards">
+            <div class="solution-card reveal reveal-delay-1">
+                <h4 data-en="Direct Artisan Connection"
+                    data-mr="थेट विणकर संपर्क">
+                    Direct Artisan Connection
+                </h4>
+                <p data-en="Browse verified artisans, explore their craft, and build a relationship rooted in authenticity."
+                   data-mr="सत्यापित विणकर शोधा, त्यांची कला जाणून घ्या आणि विश्वासावर आधारित नाते जोडा.">
+                    Browse verified artisans, explore their craft, and build a relationship rooted in authenticity.
+                </p>
+            </div>
+            <div class="solution-card reveal reveal-delay-2">
+                <h4 data-en="Transparent Pricing"
+                    data-mr="पारदर्शक किंमत">
+                    Transparent Pricing
+                </h4>
+                <p data-en="Know exactly what you pay for — every rupee goes to the hands that weave."
+                   data-mr="तुम्ही काय देता ते नक्की जाणून घ्या — प्रत्येक रुपया विणकराच्या हातात जातो.">
+                    Know exactly what you pay for — every rupee goes to the hands that weave.
+                </p>
+            </div>
+            <div class="solution-card reveal reveal-delay-3">
+                <h4 data-en="Custom Creations"
+                    data-mr="सानुकूल निर्मिती">
+                    Custom Creations
+                </h4>
+                <p data-en="Request bespoke Paithani designs — from motif to colour to border — crafted only for you."
+                   data-mr="आपल्यासाठी खास पैठणी डिझाइन मागवा — मोटिफपासून रंगापर्यंत, काठापर्यंत.">
+                    Request bespoke Paithani designs — from motif to colour to border — crafted only for you.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     BENEFITS
+══════════════════════════════════════════════ -->
+<section class="lang-fade" style="background:#fff; border-top:1px solid rgba(201,168,76,0.2); border-bottom:1px solid rgba(201,168,76,0.2);">
+    <div class="section-wrap">
+        <span class="section-eyebrow reveal"
+              data-en="Who Benefits"
+              data-mr="कोणाला फायदा">Who Benefits</span>
+        <h2 class="section-title reveal"
+            data-en="For Every Part of the Story"
+            data-mr="प्रत्येक भूमिकेसाठी">
+            For Every Part of the Story
+        </h2>
+        <div class="gold-rule reveal"></div>
+
+        <div class="benefits-wrap">
+            <div class="reveal">
+                <h3 class="benefit-block-title">
+                    <span class="dot"></span>
+                    <span data-en="For Customers" data-mr="ग्राहकांसाठी">For Customers</span>
+                </h3>
+                <ul class="benefit-list">
+                    @{
+                        var cEn = new List<string> {
+                                        "Buy authentic Paithani directly from artisans",
+                                        "No middleman commission",
+                                        "Transparent pricing",
+                                        "Customization options available"
+                                        };
+                        var cMr = new List<string> {
+                                        "थेट विणकरांकडून खस्सी पैठणी खरेदी करा",
+                                        "कोणतेही दलाल कमिशन नाही",
+                                        "पारदर्शक किंमत",
+                                        "सानुकूल पर्याय उपलब्ध"
+                                        };
+                        for (int i = 0; i < Model.CustomerBenefits.Count && i < cEn.Count; i++)
+                        {
+                            <li data-en="@cEn[i]" data-mr="@cMr[i]">@cEn[i]</li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="reveal reveal-delay-2">
+                <h3 class="benefit-block-title">
+                    <span class="dot"></span>
+                    <span data-en="For Sellers" data-mr="विक्रेत्यांसाठी">For Sellers</span>
+                </h3>
+                <ul class="benefit-list">
+                    @{
+                        var sEn = new List<string> {
+                                        "Reach customers across India",
+                                        "Sell directly without middlemen",
+                                        "Showcase your craftsmanship",
+                                        "Get better profit margins"
+                                        };
+                        var sMr = new List<string> {
+                                        "संपूर्ण भारतातील ग्राहकांपर्यंत पोहोचा",
+                                        "दलालांशिवाय थेट विका",
+                                        "आपली कारागिरी दाखवा",
+                                        "अधिक नफा मिळवा"
+                                        };
+                        for (int i = 0; i < Model.SellerBenefits.Count && i < sEn.Count; i++)
+                        {
+                            <li data-en="@sEn[i]" data-mr="@sMr[i]">@sEn[i]</li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════ -->
+<section class="works-section lang-fade">
+    <div class="section-wrap">
+        <span class="section-eyebrow reveal" style="color:var(--gold)"
+              data-en="Process" data-mr="प्रक्रिया">Process</span>
+        <h2 class="section-title reveal" style="color:#fff"
+            data-en="How It Works"
+            data-mr="हे कसे कार्य करते">
+            How It Works
+        </h2>
+        <div class="gold-rule reveal"></div>
+        <p class="section-lead reveal"
+           data-en="Four simple steps from artisan to your doorstep."
+           data-mr="विणकरापासून तुमच्या दारापर्यंत — चार सोपे टप्पे.">
+            Four simple steps from artisan to your doorstep.
+        </p>
+
+        <div class="steps-grid">
+            <div class="step reveal reveal-delay-1">
+                <div class="step-circle">I</div>
+                <h4 data-en="Artisan Registers"
+                    data-mr="विणकर नोंदणी करतो">
+                    Artisan Registers
+                </h4>
+                <p data-en="Sellers create a profile and showcase their authentic Paithani collection."
+                   data-mr="विक्रेते प्रोफाइल तयार करतात आणि त्यांचा खस्सी पैठणी संग्रह दाखवतात.">
+                    Sellers create a profile and showcase their authentic Paithani collection.
+                </p>
+            </div>
+            <div class="step reveal reveal-delay-2">
+                <div class="step-circle">II</div>
+                <h4 data-en="Customers Explore"
+                    data-mr="ग्राहक शोधतात">
+                    Customers Explore
+                </h4>
+                <p data-en="Browse real sarees from verified weavers across Yeola and beyond."
+                   data-mr="येओला आणि इतर ठिकाणच्या सत्यापित विणकरांकडील साड्या पाहा.">
+                    Browse real sarees from verified weavers across Yeola and beyond.
+                </p>
+            </div>
+            <div class="step reveal reveal-delay-3">
+                <div class="step-circle">III</div>
+                <h4 data-en="Direct Conversation"
+                    data-mr="थेट संवाद">
+                    Direct Conversation
+                </h4>
+                <p data-en="Discuss customization, pricing, and timelines directly with the artisan."
+                   data-mr="विणकराशी थेट अनुकूलन, किंमत आणि वेळापत्रकाबद्दल बोला.">
+                    Discuss customization, pricing, and timelines directly with the artisan.
+                </p>
+            </div>
+            <div class="step reveal reveal-delay-3" style="transition-delay:0.4s">
+                <div class="step-circle">IV</div>
+                <h4 data-en="Order &amp; Delivery"
+                    data-mr="ऑर्डर आणि वितरण">
+                    Order &amp; Delivery
+                </h4>
+                <p data-en="The artisan weaves and delivers your saree with care and craftsmanship."
+                   data-mr="विणकर काळजीपूर्वक तुमची साडी विणतो आणि पाठवतो.">
+                    The artisan weaves and delivers your saree with care and craftsmanship.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     CTA
+══════════════════════════════════════════════ -->
+<section class="cta-section lang-fade">
+    <div class="cta-bg-text" data-en="Paithani" data-mr="पैठणी">Paithani</div>
+    <div class="section-wrap">
+        <h2 class="reveal">
+            <span data-en="Support Traditional"
+                  data-mr="पारंपरिक पैठणी विणकरांना">Support Traditional</span><br>
+            <em data-en="Paithani Artisans"
+                data-mr="आधार द्या">Paithani Artisans</em>
+        </h2>
+        <p class="reveal reveal-delay-1"
+           data-en="Join Majhi Paithani and help preserve the living heritage of Paithani weaving for generations to come."
+           data-mr="माझी पैठणीमध्ये सामील व्हा आणि पैठणी विणकामाचा जिवंत वारसा पुढील पिढ्यांसाठी जतन करण्यास मदत करा.">
+            Join Majhi Paithani and help preserve the living heritage of Paithani weaving for generations to come.
+        </p>
+        <a href="/Account/Register" class="btn-gold reveal reveal-delay-2">
+            <span data-en="Become a Seller Today"
+                  data-mr="आजच विक्रेता व्हा">Become a Seller Today</span>
+        </a>
+    </div>
+</section>
+
+<div class="footer-bar lang-fade">
+    <span data-en="© Majhi Paithani · Preserving Heritage · Made with pride in Maharashtra"
+          data-mr="© माझी पैठणी · वारसा जपत · महाराष्ट्राचा अभिमान">
+        © Majhi Paithani · Preserving Heritage · Made with pride in Maharashtra
+    </span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════ -->
+<script>
+    // ── Scroll Reveal ──────────────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                revealObserver.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ── Language System ────────────────────────────
+    const LANG_KEY = 'majhi-lang';
+    let activeLang = localStorage.getItem(LANG_KEY) || 'en';
+
+    function applyLang(lang) {
+        // Swap every element that has data-en / data-mr
+        document.querySelectorAll('[data-en]').forEach(el => {
+            const val = el.getAttribute('data-' + lang);
+            if (!val) return;
+            // Only update leaf text nodes (no child elements) to avoid breaking HTML structure
+            if (el.children.length === 0) {
+                el.textContent = val;
+            }
+        });
+    }
+
+    function setLang(lang) {
+        if (lang === activeLang) return;
+        activeLang = lang;
+        localStorage.setItem(LANG_KEY, lang);
+
+        // Update toggle buttons
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.getElementById('btn-mr').classList.toggle('active', lang === 'mr');
+
+        // Fade out → swap text → fade in
+        const fadeSections = document.querySelectorAll('.lang-fade');
+        fadeSections.forEach(el => el.classList.add('out'));
+
+        setTimeout(() => {
+            applyLang(lang);
+            fadeSections.forEach(el => el.classList.remove('out'));
+        }, 260);
+    }
+
+    // Apply on first load (respects saved preference)
+    if (activeLang === 'mr') {
+        document.getElementById('btn-en').classList.remove('active');
+        document.getElementById('btn-mr').classList.add('active');
+        applyLang('mr');
+    }
+</script>
