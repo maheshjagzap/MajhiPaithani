@@ -17,7 +17,7 @@ public partial class User
 
     public string? SPasswordHash { get; set; }
 
-    public int? IRoleId { get; set; }
+    public int IRoleId { get; set; }
 
     public bool? BIsActive { get; set; }
 

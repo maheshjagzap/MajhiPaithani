@@ -1,5 +1,6 @@
-﻿using MajhiPaithani.Application.Interfaces;
+﻿using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Models.Request;
+using MajhiPaithani.Application.Models.Request.MajhiPaithani.Application.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -17,6 +18,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterRequest request)
     {
         var result = await _authService.RegisterAsync(request);
+        return Ok(result);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginAsync(LoginRequest request)
+    {
+        var result = await _authService.LoginAsync(request);
+
         return Ok(result);
     }
 }

@@ -1,4 +1,4 @@
-using MajhiPaithani.Application.Interfaces;
+using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 /// Note: Ensure that the connection string "DefaultConnection" is defined in appsettings.json or user secrets
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 
 // add services and interfaces here
