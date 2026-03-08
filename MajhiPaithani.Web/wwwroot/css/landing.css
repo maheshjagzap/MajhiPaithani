@@ -1,0 +1,28 @@
+﻿/* ═══════════════════════════════════════════════
+   Majhi Paithani — site.css
+   All critical styles are embedded in Index.cshtml
+   Add global resets & layout helpers here
+   ═══════════════════════════════════════════════ */
+
+/* Remove default Bootstrap container padding conflict */
+.container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Remove Bootstrap's default .btn styles from our custom buttons */
+.btn-gold, .btn-ghost {
+    border-radius: 0 !important;
+}
+
+/* Responsive image safety */
+img {
+    max-width: 100%;
+    height: auto;
+}
