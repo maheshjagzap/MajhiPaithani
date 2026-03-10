@@ -10,7 +10,73 @@
     padding-right: 0 !important;
     max-width: 100% !important;
 }
+/* ══════════════════════════════
+           NAVBAR
+══════════════════════════════ */
 
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 18px 40px;
+    z-index: 9999;
+    background: rgba(26,5,8,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo a {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+    .nav-links a {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: rgba(255,255,255,0.7);
+        transition: 0.3s;
+    }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+/* login */
+
+.nav-login {
+    padding: 8px 16px;
+    border: 1px solid rgba(201,168,76,0.4);
+}
+
+/* register button */
+
+.nav-register {
+    padding: 8px 18px;
+    background: var(--gold);
+    color: var(--deep) !important;
+}
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
@@ -65,19 +131,16 @@ body {
            LANGUAGE TOGGLE
         ══════════════════════════════ */
 .lang-toggle {
-    position: fixed;
-    top: 20px;
-    right: 24px;
-    z-index: 10000;
     display: flex;
     align-items: center;
+    margin-left: 10px;
     background: rgba(26, 5, 8, 0.88);
     border: 1px solid rgba(201, 168, 76, 0.45);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-radius: 2px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 .lang-btn {
