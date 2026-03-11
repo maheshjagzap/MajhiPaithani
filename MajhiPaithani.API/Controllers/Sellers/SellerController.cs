@@ -12,9 +12,6 @@ public class SellerController : ControllerBase
     {
         _sellerService = sellerService;
     }
-
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -27,9 +24,6 @@ public class SellerController : ControllerBase
 
         return Ok(result);
     }
-
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -42,9 +36,6 @@ public class SellerController : ControllerBase
 
         return Ok(result);
     }
-
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -63,7 +54,7 @@ public class SellerController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("bank-details")]
+    [HttpPost("add-bank-details")]
     public async Task<IActionResult> AddSellerBankDetails(AddSellerBankDetailsRequest request)
     {
         var result = await _sellerService.AddSellerBankDetailsAsync(request);
