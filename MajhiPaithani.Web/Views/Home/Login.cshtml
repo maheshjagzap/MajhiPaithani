@@ -1,4 +1,5 @@
-﻿@model MajhiPaithani.Web.ViewModels.Home.LandingPageViewModel
+﻿@model MajhiPaithani.Web.ViewModels.Home.LoginViewModel
+@* Note: Changed to LoginViewModel as it's more specific for a login post *@
 
 @{
     Layout = null;
@@ -10,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Majhi Paithani</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Josefin+Sans:wght@200;300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
@@ -21,6 +23,7 @@
             --silk: #FDF6EC;
             --text-dark: #1e1008;
             --text-mid: #5a3a2a;
+            --error: #fca5a5;
         }
 
         * {
@@ -35,24 +38,16 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            color: #fff;
         }
 
+        /* --- Background Effects --- */
         .bg-pattern {
             position: fixed;
             inset: 0;
             z-index: 0;
-            overflow: hidden;
+            background: radial-gradient(circle at 20% 50%, rgba(201, 168, 76, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(74, 14, 26, 0.15) 0%, transparent 50%);
         }
-
-            .bg-pattern::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle at 20% 50%, rgba(201, 168, 76, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(74, 14, 26, 0.15) 0%, transparent 50%);
-            }
 
         .mandala-bg {
             position: fixed;
@@ -66,6 +61,7 @@
             color: var(--gold);
         }
 
+        /* --- Container & Card --- */
         .login-container {
             min-height: 100vh;
             display: flex;
@@ -80,13 +76,12 @@
             background: linear-gradient(135deg, rgba(26, 5, 8, 0.95) 0%, rgba(74, 14, 26, 0.95) 100%);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(201, 168, 76, 0.2);
-            border-radius: 8px;
-            padding: 60px;
-            max-width: 500px;
+            border-radius: 12px;
+            padding: 50px 40px;
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             position: relative;
-            overflow: hidden;
         }
 
             .login-card::before {
@@ -99,16 +94,7 @@
                 background: linear-gradient(90deg, transparent, var(--gold), transparent);
             }
 
-            .login-card::after {
-                content: '✦';
-                position: absolute;
-                top: 30px;
-                right: 40px;
-                font-size: 60px;
-                color: var(--gold);
-                opacity: 0.08;
-            }
-
+        /* --- Elements --- */
         .back-home {
             position: absolute;
             top: 30px;
@@ -120,16 +106,13 @@
             font-family: 'Josefin Sans', sans-serif;
             font-size: 11px;
             letter-spacing: 2px;
-            text-transform: uppercase;
             text-decoration: none;
             color: rgba(255, 255, 255, 0.5);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
+            padding: 10px 18px;
             border: 1px solid rgba(201, 168, 76, 0.2);
             border-radius: 4px;
-            transition: all 0.3s ease;
+            transition: 0.3s;
+            text-transform: uppercase;
         }
 
             .back-link:hover {
@@ -138,106 +121,73 @@
                 background: rgba(201, 168, 76, 0.05);
             }
 
-        .brand-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
         .brand-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 42px;
+            font-size: 38px;
             font-weight: 900;
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: 2px;
+            text-align: center;
+            letter-spacing: 1px;
         }
 
         .brand-tagline {
+            text-align: center;
             font-family: 'Josefin Sans', sans-serif;
-            font-size: 11px;
-            letter-spacing: 5px;
+            font-size: 10px;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.4);
+            margin-top: 5px;
         }
 
-        .divider {
+        .divider-ornament {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
-            margin: 32px 0;
+            gap: 15px;
+            margin: 25px 0;
+            color: var(--gold);
         }
 
-            .divider span {
+            .divider-ornament span {
                 height: 1px;
                 flex: 1;
-                background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.3), transparent);
+                background: rgba(201, 168, 76, 0.2);
             }
 
-            .divider i {
-                color: var(--gold);
-                font-size: 10px;
-                font-style: normal;
-            }
-
-        .form-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .form-subtitle {
-            text-align: center;
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 40px;
-            font-style: italic;
-            font-weight: 300;
-        }
-
+        /* --- Form Styles --- */
         .form-group {
-            margin-bottom: 28px;
-            position: relative;
+            margin-bottom: 22px;
         }
 
         .form-label {
             display: block;
             font-family: 'Josefin Sans', sans-serif;
             font-size: 11px;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 12px;
-            font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
         }
 
         .form-input {
             width: 100%;
-            padding: 16px 20px;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px;
-            border: 1px solid rgba(201, 168, 76, 0.25);
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(201, 168, 76, 0.2);
             border-radius: 4px;
-            transition: all 0.3s ease;
-            outline: none;
+            color: #fff;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            transition: 0.3s;
         }
 
-            .form-input::placeholder {
-                color: rgba(255, 255, 255, 0.25);
-            }
-
             .form-input:focus {
+                outline: none;
                 border-color: var(--gold);
-                background: rgba(201, 168, 76, 0.08);
-                box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+                background: rgba(201, 168, 76, 0.05);
             }
 
         .password-wrapper {
@@ -246,186 +196,76 @@
 
         .password-toggle {
             position: absolute;
-            right: 16px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.4);
             cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-            padding: 5px;
         }
-
-            .password-toggle:hover {
-                color: var(--gold);
-            }
-
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--gold);
-        }
-
-        .checkbox-label {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .forgot-link {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-            .forgot-link:hover {
-                color: var(--gold);
-            }
 
         .btn-submit {
             width: 100%;
-            padding: 18px;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 13px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            padding: 16px;
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
             color: var(--deep);
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            font-family: 'Josefin Sans', sans-serif;
             font-weight: 600;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+            margin-top: 10px;
         }
 
             .btn-submit:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 10px 30px rgba(201, 168, 76, 0.4);
+                box-shadow: 0 8px 20px rgba(201, 168, 76, 0.3);
             }
 
-            .btn-submit:active {
-                transform: translateY(0);
-            }
-
-        .social-login {
-            margin-top: 32px;
+        .error-summary {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--error);
         }
 
-        .social-divider {
-            text-align: center;
-            position: relative;
-            margin-bottom: 24px;
-        }
-
-            .social-divider::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: rgba(201, 168, 76, 0.2);
-            }
-
-            .social-divider span {
-                background: var(--burgundy);
-                padding: 0 16px;
-                color: rgba(255, 255, 255, 0.4);
-                font-size: 13px;
-                position: relative;
-                font-style: italic;
+            .error-summary ul {
+                list-style: none;
             }
 
         .social-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            margin-top: 20px;
         }
 
         .btn-social {
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(201, 168, 76, 0.2);
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
             border-radius: 4px;
-            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
             font-family: 'Josefin Sans', sans-serif;
             font-size: 12px;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: 0.3s;
         }
 
             .btn-social:hover {
-                background: rgba(255, 255, 255, 0.08);
+                background: rgba(201, 168, 76, 0.1);
                 border-color: var(--gold);
-                color: #fff;
             }
-
-        .register-link {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 28px;
-            border-top: 1px solid rgba(201, 168, 76, 0.15);
-        }
-
-        .register-text {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 8px;
-        }
-
-        .register-btn {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--gold);
-            font-weight: 600;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-            .register-btn:hover {
-                color: var(--gold-light);
-            }
-
-        .error-message {
-            display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 12px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -433,125 +273,95 @@
     <div class="bg-pattern"></div>
 
     <div class="mandala-bg">
-        <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="250" cy="250" r="240" stroke="currentColor" stroke-width="0.5" opacity="0.3" />
-            <circle cx="250" cy="250" r="200" stroke="currentColor" stroke-width="0.5" opacity="0.4" />
-            <circle cx="250" cy="250" r="160" stroke="currentColor" stroke-width="0.5" opacity="0.5" />
-            <circle cx="250" cy="250" r="120" stroke="currentColor" stroke-width="0.5" opacity="0.6" />
-            <circle cx="250" cy="250" r="80" stroke="currentColor" stroke-width="0.5" opacity="0.7" />
-            <circle cx="250" cy="250" r="40" stroke="currentColor" stroke-width="0.5" opacity="0.8" />
-            <line x1="250" y1="10" x2="250" y2="490" stroke="currentColor" stroke-width="0.4" opacity="0.4" />
-            <line x1="10" y1="250" x2="490" y2="250" stroke="currentColor" stroke-width="0.4" opacity="0.4" />
-            <line x1="80" y1="80" x2="420" y2="420" stroke="currentColor" stroke-width="0.4" opacity="0.3" />
-            <line x1="420" y1="80" x2="80" y2="420" stroke="currentColor" stroke-width="0.4" opacity="0.3" />
-            <polygon points="250,30 470,180 470,320 250,470 30,320 30,180" stroke="currentColor" stroke-width="0.4" fill="none" opacity="0.3" />
+        <svg viewBox="0 0 500 500" fill="none" stroke="currentColor">
+            <circle cx="250" cy="250" r="240" stroke-width="0.5" opacity="0.3" />
+            <circle cx="250" cy="250" r="180" stroke-width="0.5" opacity="0.5" />
+            <circle cx="250" cy="250" r="120" stroke-width="0.5" opacity="0.7" />
         </svg>
     </div>
 
     <div class="back-home">
-        <a href="/" class="back-link">
-            ← Back to Home
-        </a>
+        <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Home</a>
     </div>
 
     <div class="login-container">
         <div class="login-card">
-            <div class="brand-header">
+            <header>
                 <h1 class="brand-logo">Majhi Paithani</h1>
                 <p class="brand-tagline">Authentic Heritage</p>
-            </div>
+            </header>
 
-            <div class="divider">
+            <div class="divider-ornament">
                 <span></span>
-                <i>✦</i>
+                <i class="fa-solid fa-crown"></i>
                 <span></span>
             </div>
 
-            <h2 class="form-title">Welcome Back</h2>
-            <p class="form-subtitle">Sign in to continue your journey</p>
+            <h2 style="text-align:center; font-family:'Playfair Display'; margin-bottom:5px;">Welcome Back</h2>
+            <p style="text-align:center; color:rgba(255,255,255,0.5); font-style:italic; margin-bottom:30px;">Continue your journey into elegance</p>
 
-            <div class="error-message" id="errorMessage">
-                Invalid email or password. Please try again.
-            </div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="error-summary" asp-validation-summary="All"></div>
+            }
 
-            <form id="loginForm" action="/Account/Login" method="post">
+            <form asp-controller="Home" asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+
                 <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
-                    <input type="email"
-                           id="email"
-                           name="email"
-                           class="form-input"
-                           placeholder="you@example.com"
-                           required>
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email" class="form-input" placeholder="you@example.com" required />
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
+                    <label asp-for="Password" class="form-label">Password</label>
                     <div class="password-wrapper">
-                        <input type="password"
-                               id="password"
-                               name="password"
-                               class="form-input"
-                               placeholder="Enter your password"
-                               required>
+                        <input asp-for="Password" type="password" id="password" class="form-input" placeholder="••••••••" required />
                         <button type="button" class="password-toggle" onclick="togglePassword()">
-                            👁️
+                            <i id="toggleIcon" class="fa-regular fa-eye"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-options">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="remember" name="remember" class="form-checkbox">
-                        <label for="remember" class="checkbox-label">Remember me</label>
-                    </div>
-                    <a href="/Account/ForgotPassword" class="forgot-link">Forgot password?</a>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; font-size:14px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        @* <input type="checkbox" asp-for="RememberMe" style="accent-color:var(--gold);"> Remember me *@
+                    </label>
+                    <a href="/Home/ForgotPassword" style="color:var(--gold); text-decoration:none;">Forgot Password?</a>
                 </div>
 
-                <button type="submit" class="btn-submit">
-                    Sign In
-                </button>
+                <button type="submit" class="btn-submit">Sign In</button>
             </form>
 
-            <div class="social-login">
-                <div class="social-divider">
-                    <span>or continue with</span>
-                </div>
-                <div class="social-buttons">
-                    <button type="button" class="btn-social">
-                        <span>🔵</span> Google
-                    </button>
-                    <button type="button" class="btn-social">
-                        <span>📱</span> Phone
-                    </button>
-                </div>
+            <div style="text-align:center; margin-top:30px; position:relative;">
+                <span style="background:var(--burgundy); padding:0 15px; position:relative; z-index:1; font-size:12px; color:rgba(255,255,255,0.4);">OR LOGIN WITH</span>
+                <hr style="position:absolute; top:50%; width:100%; border:0; border-top:1px solid rgba(201, 168, 76, 0.2);">
             </div>
 
-            <div class="register-link">
-                <p class="register-text">Don't have an account?</p>
-                <a href="/Home/Register" class="register-btn">Create Account →</a>
+            <div class="social-buttons">
+                <button class="btn-social"><i class="fa-brands fa-google" style="color:#DB4437;"></i> Google</button>
+                <button class="btn-social"><i class="fa-solid fa-mobile-screen-button"></i> Phone</button>
+            </div>
+
+            <div style="text-align:center; margin-top:40px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:10px;">New to the Heritage?</p>
+                <a href="/Home/Register" style="color:var(--gold); font-family:'Josefin Sans'; letter-spacing:1px; text-transform:uppercase; text-decoration:none; font-weight:600;">Create Account <i class="fa-solid fa-arrow-right-long"></i></a>
             </div>
         </div>
     </div>
 
     <script>
         function togglePassword() {
-            const field = document.getElementById('password');
-            const type = field.type === 'password' ? 'text' : 'password';
-            field.type = type;
+            const field = document.getElementById("password");
+            const icon = document.getElementById("toggleIcon");
+            if (field.type === "password") {
+                field.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                field.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
         }
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            console.log('Login attempt:', { email, password });
-
-            // Uncomment to actually submit the form
-            // this.submit();
-        });
     </script>
 
 </body>

@@ -35,7 +35,7 @@ public class AuthService : IAuthService
             SEmail = request.sEmail,
             SPhoneNumber = request.sPhoneNumber,
             SPasswordHash = request.sPassword,
-            IRoleId = 3,
+            IRoleId = request.RoleId,
             BIsActive = true,
             DCreatedDate = DateTime.UtcNow
         };
