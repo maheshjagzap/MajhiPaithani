@@ -14,5 +14,7 @@ namespace MajhiPaithani.Application.Models.Request
         public string sPhoneNumber { get; set; }
         public string sPassword { get; set; }
 
+        public int RoleId { get; set; }
+
     }
 }
