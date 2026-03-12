@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MajhiPaithani.Application.Models.Request
 {
-    public class RegisterSellerRequest
+    public class UpdateShopDetailsRequest
     {
-        public int UserId { get; set; }
+        public int SellerId { get; set; }
 
         public string ShopName { get; set; }
 
@@ -20,16 +20,6 @@ namespace MajhiPaithani.Application.Models.Request
 
         public string Pincode { get; set; }
 
-        public string Description { get; set; }
-
-        public string AccountHolderName { get; set; }
-
-        public string AccountNumber { get; set; }
-
-        public string IFSCCode { get; set; }
-
-        public string AadharNumber { get; set; }
-
-        public string PanNumber { get; set; }
+        public string BusinessDescription { get; set; }
     }
 }

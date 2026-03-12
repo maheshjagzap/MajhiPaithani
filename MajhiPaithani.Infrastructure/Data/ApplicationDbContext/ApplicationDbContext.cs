@@ -18,7 +18,7 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<AdminLog> AdminLogs { get; set; }
     public virtual DbSet<Productdemo> Productdemos { get; set; }
-
+    public DbSet<Design> Designs { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<CartItem> CartItems { get; set; }

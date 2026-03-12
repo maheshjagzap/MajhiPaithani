@@ -1,5 +1,6 @@
 ﻿using MajhiPaithani.Application.Models.Request;
 using MajhiPaithani.Application.Models.Response;
+using MajhiPaithani.Application.Models.Response.UpdateBankDetailsResponse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,13 @@ namespace MajhiPaithani.Application.Interfaces.ISellerInserface
         Task<string> UpdateSellerProfileAsync(int sellerId, UpdateSellerProfileRequest request);
         Task<RegisterSellerResponse> RegisterSellerAsync(RegisterSellerRequest request);
         Task<AddSellerBankDetailsResponse> AddSellerBankDetailsAsync(AddSellerBankDetailsRequest request);
-
-
-
+        Task<GetSellerBankDetailsResponse> GetSellerBankDetailsAsync(int sellerId);
+        Task<UpdateBankDetailsResponse> UpdateSellerBankDetailsAsync(UpdateBankDetailsRequest request);
+        Task<UploadSellerProfileImageResponse> UploadSellerProfileImageAsync(UploadSellerProfileImageRequest request);
+        Task<UpdateShopDetailsResponse> UpdateSellerShopDetailsAsync(UpdateShopDetailsRequest request);
+        Task<AddDesignResponse> AddDesignAsync(AddDesignRequest request);
+        Task<List<GetSellerDesignsResponse>> GetSellerDesignsAsync(int sellerId);
+        Task<UpdateDesignResponse> UpdateDesignAsync(int designId, UpdateDesignRequest request);
     }
 }
+    
