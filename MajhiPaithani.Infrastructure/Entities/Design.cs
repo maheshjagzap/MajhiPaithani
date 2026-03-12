@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace MajhiPaithani.Infrastructure.Entities
 {
     public partial class Design
     {
+        [Key]
         public int IDesignId { get; set; }
 
         public int ISellerId { get; set; }

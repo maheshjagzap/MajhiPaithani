@@ -12,14 +12,16 @@ using Microsoft.EntityFrameworkCore;
 public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
-
-    public AuthService(ApplicationDbContext context)
+    private readonly IJwtTokenService _jwtTokenService;
+    public AuthService(ApplicationDbContext context, IJwtTokenService jwtTokenService)
     {
         _context = context;
+        _jwtTokenService = jwtTokenService;
     }
 
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {
+     
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(x => x.SEmail == request.sEmail);
 
@@ -53,6 +55,8 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
+        Seller? seller = null;
+
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.SEmail == request.Email);
 
@@ -62,8 +66,21 @@ public class AuthService : IAuthService
         if (user.SPasswordHash != request.Password)
             throw new Exception("Invalid email or password");
 
-        var seller = await _context.Sellers
-            .FirstOrDefaultAsync(x => x.IUserId == user.IUserId);
+        if (user.IRoleId == 2)
+        {
+            seller = await _context.Sellers
+                .FirstOrDefaultAsync(x => x.IUserId == user.IUserId);
+        }
+
+        var role = user.IRoleId == 1 ? "Admin" :
+                   user.IRoleId == 2 ? "Seller" : "Customer";
+
+        // Generate JWT Token
+        var token = _jwtTokenService.GenerateToken(
+            user.IUserId,
+            user.SEmail,
+            role
+        );
 
         return new LoginResponse
         {
@@ -72,10 +89,9 @@ public class AuthService : IAuthService
             Email = user.SEmail,
             PhoneNumber = user.SPhoneNumber,
             Role = user.IRoleId,
-            //ProfileImage = user.ProfileImage,
             IsSeller = seller != null,
             SellerId = seller?.ISellerId,
-            Token = "JWT_TOKEN"
+            Token = token
         };
     }
 }
