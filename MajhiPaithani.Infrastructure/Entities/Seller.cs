@@ -13,6 +13,18 @@ public partial class Seller
 
     public string? SShopDescription { get; set; }
 
+    public string? SShopAddress { get; set; }
+
+    public string? SCity { get; set; }
+
+    public string? SState { get; set; }
+
+    public string? SPincode { get; set; }
+
+    public string? SBusinessDescription { get; set; }
+
+    public string? SProfileImageUrl { get; set; }
+
     public int ILocationId { get; set; }
 
     public bool? BIsVerified { get; set; }
@@ -26,4 +38,8 @@ public partial class Seller
     public DateTime? DUpdatedDate { get; set; }
 
     public DateTime? DDeletedDate { get; set; }
+
+    // Navigation Properties (optional but recommended)
+
+    public virtual ICollection<SellerBankDetail> SellerBankDetails { get; set; } = new List<SellerBankDetail>();
 }

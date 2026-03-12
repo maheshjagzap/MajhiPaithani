@@ -1,6 +1,7 @@
 using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
+using MajhiPaithani.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
