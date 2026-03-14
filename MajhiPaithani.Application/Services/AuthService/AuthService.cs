@@ -88,7 +88,8 @@ public class AuthService : IAuthService
             Name = user.SFirstName,
             Email = user.SEmail,
             PhoneNumber = user.SPhoneNumber,
-            Role = user.IRoleId,
+            Role = role,
+            RoleId = user.IRoleId,
             IsSeller = seller != null,
             SellerId = seller?.ISellerId,
             Token = token
