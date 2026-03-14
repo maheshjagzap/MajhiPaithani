@@ -18,9 +18,7 @@ namespace MajhiPaithani.Infrastructure.Services
             _context = context;
         }
 
-        /// <summary>
-        /// Register new seller
-        /// </summary>
+
         public async Task<RegisterSellerResponse> RegisterSellerAsync(RegisterSellerRequest request)
         {
             if (request == null)
@@ -60,10 +58,6 @@ namespace MajhiPaithani.Infrastructure.Services
                 sMessage = "Seller registered successfully. Waiting for admin approval."
             };
         }
-
-        /// <summary>
-        /// Get seller profile
-        /// </summary>
         public async Task<GetSellerProfileResponse> GetSellerProfileAsync(int sellerId)
         {
             var seller = await _context.Sellers
@@ -83,10 +77,6 @@ namespace MajhiPaithani.Infrastructure.Services
                 bIsActive = seller.BIsActive
             };
         }
-
-        /// <summary>
-        /// Update seller profile
-        /// </summary>
         public async Task<string> UpdateSellerProfileAsync(int sellerId, UpdateSellerProfileRequest request)
         {
             if (request == null)
@@ -113,10 +103,6 @@ namespace MajhiPaithani.Infrastructure.Services
 
             return "Seller profile updated successfully";
         }
-
-        /// <summary>
-        /// Add seller bank details
-        /// </summary>
         public async Task<AddSellerBankDetailsResponse> AddSellerBankDetailsAsync(AddSellerBankDetailsRequest request)
         {
             if (request == null)
@@ -429,6 +415,142 @@ namespace MajhiPaithani.Infrastructure.Services
                 Message = "Design updated successfully"
             };
         }
+        public async Task<DeleteDesignResponse> DeleteDesignAsync(int designId)
+        {
+            var design = await _context.Designs
+                .FirstOrDefaultAsync(x => x.IDesignId == designId);
 
+            if (design == null)
+                throw new Exception("Design not found");
+
+            design.BIsDeleted = true;
+            design.DUpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new DeleteDesignResponse
+            {
+                DesignId = design.IDesignId,
+                DeletedDate = design.DUpdatedDate.Value,
+                Message = "Design deleted successfully"
+            };
+        }
+        public async Task<DesignDetailsResponse> GetDesignDetailsAsync(int designId)
+        {
+            var design = await _context.Designs
+                .Where(x => x.IDesignId == designId && x.BIsDeleted != true)
+                .Select(x => new DesignDetailsResponse
+                {
+                    DesignId = x.IDesignId,
+                    SellerId = x.ISellerId,
+                    DesignName = x.SDesignName,
+                    DesignType = x.SDesignType,
+                    Description = x.SDescription,
+                    ImageUrl = x.SImageUrl,
+                    CreatedDate = x.DCreatedDate.Value
+                })
+                .FirstOrDefaultAsync();
+
+            if (design == null)
+                throw new Exception("Design not found");
+
+            return design;
+        }
+        public async Task<AddProductResponse> AddProductAsync(AddProductRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var seller = await _context.Sellers
+                .FirstOrDefaultAsync(x => x.ISellerId == request.SellerId);
+
+            if (seller == null)
+                throw new Exception("Seller not found");
+
+            var product = new Product
+            {
+                ISellerId = request.SellerId,
+                ICategoryId = request.CategoryId,
+                SProductTitle = request.ProductTitle,
+                SDescription = request.Description,
+                DcBasePrice = request.BasePrice,
+                SColor = request.Color,
+                SFabric = request.Fabric,
+                SDesignType = request.DesignType,
+                BIsCustomizationAvailable = request.IsCustomizationAvailable,
+                BIsActive = true,
+                BIsDeleted = false,
+                DCreatedDate = DateTime.UtcNow
+            };
+
+            _context.Products.Add(product);
+
+            await _context.SaveChangesAsync();
+
+            return new AddProductResponse
+            {
+                ProductId = product.IProductId,
+                SellerId = product.ISellerId.Value,
+                ProductName = product.SProductTitle,
+                CreatedDate = product.DCreatedDate.Value,
+                Message = "Product created successfully"
+            };
+        }
+        public async Task<UpdateProductResponse> UpdateProductAsync(int productId, UpdateProductRequest request)
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(x => x.IProductId == productId && x.BIsDeleted != true);
+
+            if (product == null)
+                throw new Exception("Product not found");
+
+            if (!string.IsNullOrWhiteSpace(request.ProductTitle))
+                product.SProductTitle = request.ProductTitle;
+
+            if (!string.IsNullOrWhiteSpace(request.Description))
+                product.SDescription = request.Description;
+
+            if (request.BasePrice > 0)
+                product.DcBasePrice = request.BasePrice;
+
+            product.SColor = request.Color;
+            product.SFabric = request.Fabric;
+            product.SDesignType = request.DesignType;
+            product.BIsCustomizationAvailable = request.IsCustomizationAvailable;
+
+            product.DUpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new UpdateProductResponse
+            {
+                ProductId = product.IProductId,
+                UpdatedDate = product.DUpdatedDate.Value,
+                Message = "Product updated successfully"
+            };
+        }
+
+        public async Task<DeleteProductResponse> DeleteProductAsync(int productId)
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(x => x.IProductId == productId && x.BIsDeleted != true);
+
+            if (product == null)
+                throw new Exception("Product not found");
+
+            product.BIsDeleted = true;
+            product.BIsActive = false;
+            product.DDeletedDate = DateTime.UtcNow;
+            product.DUpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new DeleteProductResponse
+            {
+                ProductId = product.IProductId,
+                DeletedDate = product.DDeletedDate.Value,
+                Message = "Product deleted successfully"
+            };
+        }
     }
 }

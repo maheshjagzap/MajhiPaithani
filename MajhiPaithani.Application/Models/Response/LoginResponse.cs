@@ -20,7 +20,8 @@ namespace MajhiPaithani.Application.Models.Response
 
                 public string PhoneNumber { get; set; }
 
-                public int  Role { get; set; }
+                public string  Role { get; set; }
+                public int  RoleId { get; set; }
 
                 public string ProfileImage { get; set; }
 

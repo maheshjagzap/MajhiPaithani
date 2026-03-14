@@ -15,10 +15,8 @@ namespace MajhiPaithani.API.Controllers
             _sellerService = sellerService;
         }
 
-        /// <summary>
-        /// Register new seller
-        /// </summary>
-        [HttpPost]
+
+        [HttpPost("register-seller")]
         public async Task<IActionResult> RegisterSeller([FromBody] RegisterSellerRequest request)
         {
             if (!ModelState.IsValid)
@@ -29,9 +27,7 @@ namespace MajhiPaithani.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Get seller profile
-        /// </summary>
+
         [HttpGet("{sellerId}")]
         public async Task<IActionResult> GetSellerProfile(int sellerId)
         {
@@ -40,9 +36,6 @@ namespace MajhiPaithani.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Update seller profile
-        /// </summary>
         [HttpPut("{sellerId}/Update-profile")]
         public async Task<IActionResult> UpdateSellerProfile(int sellerId,[FromBody] UpdateSellerProfileRequest request)
         {
@@ -54,9 +47,7 @@ namespace MajhiPaithani.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Add seller bank details
-        /// </summary>
+
         [HttpPost("bank-details")]
         public async Task<IActionResult> AddSellerBankDetails([FromBody] AddSellerBankDetailsRequest request)
         {
@@ -67,9 +58,7 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Get seller bank details
-        /// </summary>
+
         [HttpGet("{sellerId}/bank-details")]
         public async Task<IActionResult> GetSellerBankDetails(int sellerId)
         {
@@ -77,9 +66,7 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Update seller bank details
-        /// </summary>
+
         [HttpPut("bank-details")]
         public async Task<IActionResult> UpdateSellerBankDetails([FromBody] UpdateBankDetailsRequest request)
         {
@@ -87,9 +74,7 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Upload seller profile image
-        /// </summary>
+
         [HttpPost("profile/upload-image")]
         public async Task<IActionResult> UploadSellerProfileImage([FromForm] UploadSellerProfileImageRequest request)
         {
@@ -97,9 +82,7 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Update seller shop details
-        /// </summary>
+
         [HttpPut("shop-details")]
         public async Task<IActionResult> UpdateSellerShopDetails([FromBody] UpdateShopDetailsRequest request)
         {
@@ -107,9 +90,7 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Upload seller design
-        /// </summary>
+
         [HttpPost("add-designs")]
         public async Task<IActionResult> AddDesign([FromForm] AddDesignRequest request)
         {
@@ -117,25 +98,63 @@ namespace MajhiPaithani.API.Controllers
 
             return Ok(result);
         }
-        /// <summary>
-        /// Get all designs of a seller
-        /// </summary>
-        [HttpGet("{sellerId}/designs")]
+
+        [HttpGet("{sellerId}/Get-all-designs")]
         public async Task<IActionResult> GetSellerDesigns(int sellerId)
         {
             var result = await _sellerService.GetSellerDesignsAsync(sellerId);
 
             return Ok(result);
         }
-        /// <summary>
-        /// Update seller design
-        /// </summary>
-        [HttpPut("designs/{designId}")]
+
+        [HttpPut("update-designs/{designId}")]
         public async Task<IActionResult> UpdateDesign(
             int designId,
             [FromForm] UpdateDesignRequest request)
         {
             var result = await _sellerService.UpdateDesignAsync(designId, request);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("designs/{designId}")]
+        public async Task<IActionResult> DeleteDesign(int designId)
+        {
+            var result = await _sellerService.DeleteDesignAsync(designId);
+
+            return Ok(result);
+        }
+
+        [HttpGet("designs/{designId}")]
+        public async Task<IActionResult> GetDesignDetails(int designId)
+        {
+            var result = await _sellerService.GetDesignDetailsAsync(designId);
+
+            return Ok(result);
+        }
+
+        [HttpPost("products")]
+        public async Task<IActionResult> AddProduct([FromBody] AddProductRequest request)
+        {
+            var result = await _sellerService.AddProductAsync(request);
+
+            return Ok(result);
+        }
+
+        [HttpPut("products/{productId}")]
+        public async Task<IActionResult> UpdateProduct(
+            int productId,
+            [FromBody] UpdateProductRequest request)
+        {
+            var result = await _sellerService.UpdateProductAsync(productId, request);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("products/{productId}")]
+        public async Task<IActionResult> DeleteProduct(int productId)
+        {
+            var result = await _sellerService.DeleteProductAsync(productId);
 
             return Ok(result);
         }

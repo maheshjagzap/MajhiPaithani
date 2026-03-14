@@ -22,6 +22,10 @@ namespace MajhiPaithani.Application.Interfaces.ISellerInserface
         Task<AddDesignResponse> AddDesignAsync(AddDesignRequest request);
         Task<List<GetSellerDesignsResponse>> GetSellerDesignsAsync(int sellerId);
         Task<UpdateDesignResponse> UpdateDesignAsync(int designId, UpdateDesignRequest request);
+        Task<DeleteDesignResponse> DeleteDesignAsync(int designId);
+        Task<DesignDetailsResponse> GetDesignDetailsAsync(int designId);
+        Task<AddProductResponse> AddProductAsync(AddProductRequest request);
+        Task<UpdateProductResponse> UpdateProductAsync(int productId, UpdateProductRequest request);
+        Task<DeleteProductResponse> DeleteProductAsync(int productId);
     }
 }
-    
