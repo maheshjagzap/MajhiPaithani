@@ -50,8 +50,12 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGet("/", () => "Majhi Paithani API is running 🚀");
+
+// Enable CORS for all origins (for development purposes)
+//app.MapGet("/", () => "Majhi Paithani API is running 🚀");
 app.MapControllers();
 
 // Render port binding
-app.Run("http://0.0.0.0:8080");
+app.Run();
+// Enable port binding for production (uncomment the line below and comment out the line above)
+//app.Run("http://0.0.0.0:8080");
