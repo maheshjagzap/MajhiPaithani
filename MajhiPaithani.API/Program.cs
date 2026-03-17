@@ -7,9 +7,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Add services
 builder.Services.AddControllers();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -39,9 +41,21 @@ builder.Services.AddAuthentication("JwtBearer")
     };
 });
 
+services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
+
+
 var app = builder.Build();
 
+
 // Enable Swagger in all environments
+app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI();
 
