@@ -92,7 +92,9 @@ public class AuthService : IAuthService
             RoleId = user.IRoleId,
             IsSeller = seller != null,
             SellerId = seller?.ISellerId,
-            Token = token
+            Token = token,
+            Message = "Login successful"
+
         };
     }
 }
