@@ -1,8 +1,11 @@
 ﻿using System.Data;
 using System.Text;
+using MajhiPaithani.API.Endpoint;
 using MajhiPaithani.API.Middleware;
+using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
+using MajhiPaithani.Application.Services;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +24,10 @@ if (string.IsNullOrEmpty(connectionString))
 services.AddSingleton(connectionString);
 services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
 services.AddTransient<SqlConnection>(_ => new SqlConnection(connectionString));
+
+services.AddScoped<DropdownDataAccess>();
+services.AddScoped<DropdownService>();
+
 
 
 // --- 1. REGISTER SERVICES (Dependency Injection) ---
@@ -83,7 +90,9 @@ app.UseAuthorization();
 
 // 4th: Routing
 app.MapControllers();
-//MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 
-/*app.Run();*/
+//MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
+Dropdown.Map(app);
+
+//app.Run();
 app.Run("http://0.0.0.0:8080");
