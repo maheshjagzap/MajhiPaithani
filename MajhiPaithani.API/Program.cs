@@ -1,14 +1,27 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Text;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
+var services = builder.Services;
+
+var connectionString = config.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+    throw new InvalidOperationException("❌ Connection string is missing in appsettings.json.");
+services.AddSingleton(connectionString);
+services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
+services.AddTransient<SqlConnection>(_ => new SqlConnection(connectionString));
+
 
 // --- 1. REGISTER SERVICES (Dependency Injection) ---
 
@@ -70,6 +83,7 @@ app.UseAuthorization();
 
 // 4th: Routing
 app.MapControllers();
+//MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 
-//app.Run();
+/*app.Run();*/
 app.Run("http://0.0.0.0:8080");
