@@ -2,6 +2,7 @@
 using MajhiPaithani.Application.Models.Request;
 using MajhiPaithani.Application.Models.Response;
 using MajhiPaithani.Application.Models.Response.UpdateBankDetailsResponse;
+using MajhiPaithani.Domain.Exceptions;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,16 +23,16 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<RegisterSellerResponse> RegisterSellerAsync(RegisterSellerRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             if (string.IsNullOrWhiteSpace(request.ShopName))
-                throw new Exception("Shop name is required");
+                throw new ValidationException("Shop name is required");
 
             var existingSeller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.IUserId == request.UserId);
 
             if (existingSeller != null)
-                throw new InvalidOperationException("User is already registered as seller");
+                throw new ConflictException("User is already registered as seller");
 
             var seller = new Seller
             {
@@ -64,7 +65,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.ISellerId == sellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             return new GetSellerProfileResponse
             {
@@ -80,19 +81,19 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<string> UpdateSellerProfileAsync(int sellerId, UpdateSellerProfileRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == sellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             if (!seller.BIsActive)
-                throw new Exception("Seller account is inactive");
+                throw new InactiveAccountException("Seller account is inactive");
 
             if (string.IsNullOrWhiteSpace(request.sShopName))
-                throw new Exception("Shop name cannot be empty");
+                throw new ValidationException("Shop name cannot be empty");
 
             seller.SShopName = request.sShopName;
             seller.SShopDescription = request.sShopDescription;
@@ -106,22 +107,22 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<AddSellerBankDetailsResponse> AddSellerBankDetailsAsync(AddSellerBankDetailsRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == request.iSellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             var existingBank = await _context.SellerBankDetails
                 .FirstOrDefaultAsync(x => x.IsellerId == request.iSellerId);
 
             if (existingBank != null)
-                throw new Exception("Bank details already added for this seller");
+                throw new ConflictException("Bank details already added for this seller");
 
             if (string.IsNullOrWhiteSpace(request.sAccountNumber))
-                throw new Exception("Account number is required");
+                throw new ValidationException("Account number is required");
 
             var bank = new SellerBankDetail
             {
@@ -149,13 +150,13 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.ISellerId == sellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             var bank = await _context.SellerBankDetails
                 .FirstOrDefaultAsync(x => x.IsellerId == sellerId);
 
             if (bank == null)
-                throw new Exception("Bank details not found");
+                throw new NotFoundException("Bank details not found");
 
             var maskedAccount = bank.SaccountNumber.Length > 4
                 ? "XXXXXX" + bank.SaccountNumber.Substring(bank.SaccountNumber.Length - 4)
@@ -174,16 +175,16 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<UpdateBankDetailsResponse> UpdateSellerBankDetailsAsync(UpdateBankDetailsRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             var bank = await _context.SellerBankDetails
                 .FirstOrDefaultAsync(x => x.IbankDetailId == request.BankDetailId);
 
             if (bank == null)
-                throw new Exception("Bank details not found");
+                throw new NotFoundException("Bank details not found");
 
             if (string.IsNullOrWhiteSpace(request.AccountNumber))
-                throw new Exception("Account number cannot be empty");
+                throw new ValidationException("Account number cannot be empty");
 
             bank.SaccountHolderName = request.AccountHolderName;
             bank.SbankName = request.BankName;
@@ -204,17 +205,16 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<UploadSellerProfileImageResponse> UploadSellerProfileImageAsync(UploadSellerProfileImageRequest request)
         {
             if (request == null || request.ImageFile == null)
-                throw new Exception("Image file is required");
+                throw new ValidationException("Image file is required");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == request.SellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
-            // Validate image size (max 5MB)
             if (request.ImageFile.Length > 5 * 1024 * 1024)
-                throw new Exception("Image size cannot exceed 5MB");
+                throw new ValidationException("Image size cannot exceed 5MB");
 
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "sellers", request.SellerId.ToString());
 
@@ -250,16 +250,16 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<UpdateShopDetailsResponse> UpdateSellerShopDetailsAsync(UpdateShopDetailsRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == request.SellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             if (string.IsNullOrWhiteSpace(request.ShopName))
-                throw new Exception("Shop name cannot be empty");
+                throw new ValidationException("Shop name cannot be empty");
 
             seller.SShopName = request.ShopName;
             seller.SShopAddress = request.ShopAddress;
@@ -282,13 +282,13 @@ namespace MajhiPaithani.Infrastructure.Services
         public async Task<AddDesignResponse> AddDesignAsync(AddDesignRequest request)
         {
             if (request == null || request.ImageFile == null)
-                throw new Exception("Design image is required");
+                throw new ValidationException("Design image is required");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == request.SellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             var design = new Design
             {
@@ -346,7 +346,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.ISellerId == sellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             var designs =   await _context.Designs
                 .Where(x => x.ISellerId == sellerId && x.BIsDeleted != true)
@@ -370,7 +370,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.IDesignId == designId);
 
             if (design == null)
-                throw new Exception("Design not found");
+                throw new NotFoundException("Design not found");
 
             if (!string.IsNullOrWhiteSpace(request.DesignName))
                 design.SDesignName = request.DesignName;
@@ -421,7 +421,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.IDesignId == designId);
 
             if (design == null)
-                throw new Exception("Design not found");
+                throw new NotFoundException("Design not found");
 
             design.BIsDeleted = true;
             design.DUpdatedDate = DateTime.UtcNow;
@@ -452,20 +452,20 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync();
 
             if (design == null)
-                throw new Exception("Design not found");
+                throw new NotFoundException("Design not found");
 
             return design;
         }
         public async Task<AddProductResponse> AddProductAsync(AddProductRequest request)
         {
             if (request == null)
-                throw new ArgumentNullException(nameof(request));
+                throw new ValidationException("Request cannot be null");
 
             var seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.ISellerId == request.SellerId);
 
             if (seller == null)
-                throw new Exception("Seller not found");
+                throw new NotFoundException("Seller not found");
 
             var product = new Product
             {
@@ -502,7 +502,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.IProductId == productId && x.BIsDeleted != true);
 
             if (product == null)
-                throw new Exception("Product not found");
+                throw new NotFoundException("Product not found");
 
             if (!string.IsNullOrWhiteSpace(request.ProductTitle))
                 product.SProductTitle = request.ProductTitle;
@@ -536,7 +536,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .FirstOrDefaultAsync(x => x.IProductId == productId && x.BIsDeleted != true);
 
             if (product == null)
-                throw new Exception("Product not found");
+                throw new NotFoundException("Product not found");
 
             product.BIsDeleted = true;
             product.BIsActive = false;

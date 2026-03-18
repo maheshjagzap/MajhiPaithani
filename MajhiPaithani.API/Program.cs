@@ -1,47 +1,49 @@
-﻿using MajhiPaithani.Application.Interfaces.IAuthService;
+﻿using System.Text;
+using MajhiPaithani.API.Middleware;
+using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
 
-// Add services
+// --- 1. REGISTER SERVICES (Dependency Injection) ---
+
 builder.Services.AddControllers();
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-builder.Services.AddAuthentication("JwtBearer")
-.AddJwtBearer("JwtBearer", options =>
-{
-    var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
-
-    options.TokenValidationParameters = new TokenValidationParameters
+// Authentication & JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"] ?? "YourDefaultFallbackKey");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
 
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
-    };
-});
-
-services.AddCors(options =>
+// CORS
+builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
         policy.AllowAnyOrigin()
@@ -49,27 +51,25 @@ services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-
-
 var app = builder.Build();
 
+// --- 2. CONFIGURE MIDDLEWARE PIPELINE (The Order Matters!) ---
 
-// Enable Swagger in all environments
+// 1st: Catch all errors and turn them into clean JSON
+app.UseMiddleware<ExceptionMiddleware>();
+
+// 2nd: Security & Swagger
+app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Middleware
-app.UseHttpsRedirection();
-
+// 3rd: Identity (Auth must be BEFORE MapControllers)
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Enable CORS for all origins (for development purposes)
-//app.MapGet("/", () => "Majhi Paithani API is running 🚀");
+// 4th: Routing
 app.MapControllers();
 
-// Render port binding
-app.Run();
-// Enable port binding for production (uncomment the line below and comment out the line above)
-//app.Run("http://0.0.0.0:8080");
+//app.Run();
+app.Run("http://0.0.0.0:8080");

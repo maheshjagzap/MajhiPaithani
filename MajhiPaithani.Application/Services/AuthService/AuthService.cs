@@ -4,6 +4,7 @@ using MajhiPaithani.Application.Models.Request.MajhiPaithani.Application.Models.
 using MajhiPaithani.Application.Models.Response;
 using MajhiPaithani.Application.Models.Response.MajhiPaithani.Application.Models.Response;
 using MajhiPaithani.Application.Models.Response.MajhiPaithani.Application.Models.Response.MajhiPaithani.Application.Models.Response;
+using MajhiPaithani.Domain.Exceptions;
 using MajhiPaithani.Infrastructure.Data;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Entities;
@@ -27,20 +28,29 @@ public class AuthService : IAuthService
 
         if (existingUser != null)
         {
-            throw new Exception("User already exists");
+            throw new ConflictException("User already exists");
         }
-
-        var user = new User
+        bool IsSellerProfileComplete;
+        if (request.RoleId ==2)
         {
-            SFirstName = request.sFirstName,
-            SLastName = request.sLastName,
-            SEmail = request.sEmail,
-            SPhoneNumber = request.sPhoneNumber,
-            SPasswordHash = request.sPassword,
-            IRoleId = request.RoleId,
-            BIsActive = true,
-            DCreatedDate = DateTime.UtcNow
-        };
+            IsSellerProfileComplete = false;
+        }
+        else
+        {
+            IsSellerProfileComplete = true;
+        }
+            var user = new User
+            {
+                SFirstName = request.sFirstName,
+                SLastName = request.sLastName,
+                SEmail = request.sEmail,
+                SPhoneNumber = request.sPhoneNumber,
+                SPasswordHash = request.sPassword,
+                IRoleId = request.RoleId,
+                BIsActive = true,
+                IsSellerProfileComplete = IsSellerProfileComplete,
+                DCreatedDate = DateTime.UtcNow
+            };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -58,13 +68,14 @@ public class AuthService : IAuthService
         Seller? seller = null;
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.SEmail == request.Email);
+            .FirstOrDefaultAsync(x => x.SEmail == request.EmailOrPhone 
+                                || x.SPhoneNumber == request.EmailOrPhone);
 
         if (user == null)
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Invalid credentials");
 
         if (user.SPasswordHash != request.Password)
-            throw new Exception("Invalid email or password");
+            throw new UnauthorizedException("Invalid credentials");
 
         if (user.IRoleId == 2)
         {
@@ -73,7 +84,8 @@ public class AuthService : IAuthService
         }
 
         var role = user.IRoleId == 1 ? "Admin" :
-                   user.IRoleId == 2 ? "Seller" : "Customer";
+                   user.IRoleId == 2 ? "Seller" :
+                   user.IRoleId == 3 ? "Customer" : "";
 
         // Generate JWT Token
         var token = _jwtTokenService.GenerateToken(
@@ -89,12 +101,12 @@ public class AuthService : IAuthService
             Email = user.SEmail,
             PhoneNumber = user.SPhoneNumber,
             Role = role,
+            IsSellerProfileComplete= user.IsSellerProfileComplete,
             RoleId = user.IRoleId,
             IsSeller = seller != null,
             SellerId = seller?.ISellerId,
             Token = token,
             Message = "Login successful"
-
         };
     }
 }

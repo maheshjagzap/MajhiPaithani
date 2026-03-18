@@ -22,6 +22,7 @@ namespace MajhiPaithani.Application.Models.Response
 
                 public string  Role { get; set; }
                 public int  RoleId { get; set; }
+                public bool IsSellerProfileComplete { get; set; }
 
                 public string ProfileImage { get; set; }
 

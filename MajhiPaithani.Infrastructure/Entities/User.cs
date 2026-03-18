@@ -16,7 +16,7 @@ public partial class User
     public string? SPhoneNumber { get; set; }
 
     public string? SPasswordHash { get; set; }
-
+    public bool IsSellerProfileComplete { get; set; }
     public int IRoleId { get; set; }
 
     public bool? BIsActive { get; set; }
