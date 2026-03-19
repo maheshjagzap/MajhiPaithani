@@ -12,12 +12,13 @@ namespace MajhiPaithani.API.Endpoint
             var savedata = app.MapGroup("/api/savedata");
 
             savedata.MapPost("/SaveSeller", async (
-                [FromBody] SellerDto dto,
+                [FromBody] SellerDto dto, [FromHeader(Name = "UserId")] int? userId,[FromHeader(Name = "RoleId")] int? roleId,
+
                 [FromServices] SaveSellerService service) =>
             {
                 try
                 {
-                    var message = await service.SaveSellerAsync(dto);
+                    var message = await service.SaveSellerAsync(dto,userId,roleId);
 
                     return Results.Ok(new
                     {
@@ -33,6 +34,34 @@ namespace MajhiPaithani.API.Endpoint
             })
             .WithName("SaveSeller")
             .WithTags("SaveData");
+
+
+            savedata.MapPost("/Savesellerbankdeatils", async ([FromBody] BankDto dto, [FromHeader(Name = "UserId")] int? userId,
+    [FromHeader(Name = "RoleId")] int? roleId, [FromServices] SaveSellerService service) =>
+            {
+                try
+                {
+                    var message = await service.updatebankdeatils(dto,userId ,roleId);
+
+                    return Results.Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = message,
+                        Data = dto
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(detail: $"Error: {ex.Message}");
+                }
+            })
+            .WithName("SaveSellerbankdeatils")
+            .WithTags("SaveData");
+
+
+
+
+
         }
     }
 }
