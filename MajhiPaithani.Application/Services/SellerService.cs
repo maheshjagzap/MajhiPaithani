@@ -17,9 +17,15 @@ namespace MajhiPaithani.Application.Services
             _dataAccess = dataAccess;
         }
 
-        public async Task<string> SaveSellerAsync(SellerDto dto)
+        public async Task<string> SaveSellerAsync(SellerDto dto, int? UserId, int? RoleId)
         {
-            return await _dataAccess.ExecuteSellerAsync(dto);
+            return await _dataAccess.ExecuteSellerAsync(dto,UserId,RoleId);
+        }
+
+
+        public async Task<string> updatebankdeatils(BankDto dto, int? UserId, int? RoleId)
+        {
+            return await _dataAccess.UpdatesellerBankdeatilsasync(dto,UserId,RoleId);
         }
     }
 }
