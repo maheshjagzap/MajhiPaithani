@@ -14,9 +14,11 @@ namespace MajhiPaithani.Application.Models.Request
         public int iUserId { get; set; }
         public string? sShopName { get; set; }
         public string? sShopDescription { get; set; }
+        public string? SShopAddress { get; set; }
+        public string? SCity { get; set; }
+        public string? SState { get; set; }
+        public string? Spincode { get; set; }
+        public string? SBusinessDescription { get; set; }
         public int iLocationId { get; set; }
-        public bool bIsVerified { get; set; }
-        public bool bIsActive { get; set; }
-        public bool bIsDeleted { get; set; }
     }
 }
