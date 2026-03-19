@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MajhiPaithani.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260309193042_InitialBaseline")]
-    partial class InitialBaseline
+    [Migration("20260319044404_dbchangesdone")]
+    partial class dbchangesdone
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -447,6 +447,48 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     b.ToTable("CustomizationRequests");
                 });
 
+            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Design", b =>
+                {
+                    b.Property<int>("IDesignId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IDesignId"));
+
+                    b.Property<bool?>("BIsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DCreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DUpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ISellerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SDesignName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SDesignType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SellerISellerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("IDesignId");
+
+                    b.HasIndex("SellerISellerId");
+
+                    b.ToTable("Designs");
+                });
+
             modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Location", b =>
                 {
                     b.Property<int>("ILocationId")
@@ -585,6 +627,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("sPaymentStatus");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("IOrderId")
                         .HasName("PK__Orders__F354140FD000231A");
@@ -1080,6 +1125,21 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("iUserId");
 
+                    b.Property<string>("SBusinessDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SPincode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SProfileImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SShopAddress")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SShopDescription")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)")
@@ -1089,6 +1149,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("sShopName");
+
+                    b.Property<string>("SState")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ISellerId")
                         .HasName("PK__Sellers__99BF1FD4CE2D8F7E");
@@ -1136,6 +1199,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("SBankName");
 
+                    b.Property<int?>("SellerISellerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Sifsccode")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -1144,6 +1210,8 @@ namespace MajhiPaithani.Infrastructure.Migrations
 
                     b.HasKey("IbankDetailId")
                         .HasName("PK__SellerBa__AD3D267EE3DBF786");
+
+                    b.HasIndex("SellerISellerId");
 
                     b.ToTable("SellerBankDetails");
                 });
@@ -1266,6 +1334,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("iRoleId");
 
+                    b.Property<bool>("IsSellerProfileComplete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("SEmail")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
@@ -1324,6 +1395,27 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasName("PK__Wishlist__AD0A7D289C37FC4F");
 
                     b.ToTable("Wishlist", (string)null);
+                });
+
+            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Design", b =>
+                {
+                    b.HasOne("MajhiPaithani.Infrastructure.Entities.Seller", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerISellerId");
+
+                    b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.SellerBankDetail", b =>
+                {
+                    b.HasOne("MajhiPaithani.Infrastructure.Entities.Seller", null)
+                        .WithMany("SellerBankDetails")
+                        .HasForeignKey("SellerISellerId");
+                });
+
+            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Seller", b =>
+                {
+                    b.Navigation("SellerBankDetails");
                 });
 #pragma warning restore 612, 618
         }

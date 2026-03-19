@@ -70,7 +70,6 @@ public class AuthService : IAuthService
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.SEmail == request.EmailOrPhone 
                                 || x.SPhoneNumber == request.EmailOrPhone);
-
         if (user == null)
             throw new UnauthorizedException("Invalid credentials");
 
@@ -83,15 +82,15 @@ public class AuthService : IAuthService
                 .FirstOrDefaultAsync(x => x.IUserId == user.IUserId);
         }
 
-        var role = user.IRoleId == 1 ? "Admin" :
-                   user.IRoleId == 2 ? "Seller" :
-                   user.IRoleId == 3 ? "Customer" : "";
+        var role = user.IRoleId == 1 ? "Admin" : user.IRoleId == 2 ? "Seller" : user.IRoleId == 3 ? "Customer" : "";
 
         // Generate JWT Token
         var token = _jwtTokenService.GenerateToken(
             user.IUserId,
             user.SEmail,
-            role
+            role,
+            user.SFirstName + " " + user.SLastName,
+            user.SPhoneNumber
         );
 
         return new LoginResponse
