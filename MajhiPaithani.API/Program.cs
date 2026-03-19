@@ -27,6 +27,8 @@ services.AddTransient<SqlConnection>(_ => new SqlConnection(connectionString));
 
 services.AddScoped<DropdownDataAccess>();
 services.AddScoped<DropdownService>();
+services.AddScoped<SaveDataAccess>();
+services.AddScoped<SaveSellerService>();
 
 
 
@@ -93,6 +95,8 @@ app.MapControllers();
 
 //MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 Dropdown.Map(app);
+SaveData.Map(app);
 
-//app.Run();
-app.Run("http://0.0.0.0:8080");
+
+app.Run();
+//app.Run("http://0.0.0.0:8080");

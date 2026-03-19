@@ -1,9 +1,7 @@
 ﻿using MajhiPaithani.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace MajhiPaithani.API.Endpoint
-{  
-
-   
+{     
         public static class Dropdown
         {
             public static void Map(WebApplication app)
