@@ -29,6 +29,8 @@ services.AddScoped<DropdownDataAccess>();
 services.AddScoped<DropdownService>();
 services.AddScoped<SaveDataAccess>();
 services.AddScoped<SaveSellerService>();
+services.AddScoped<GetSellerDashboardService>();
+services.AddScoped<GetSellerDashboardDataAccess>();
 
 
 
@@ -96,6 +98,7 @@ app.MapControllers();
 //MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 Dropdown.Map(app);
 SaveData.Map(app);
+GetSellerDashboard.Map(app);
 
 
 //app.Run();
