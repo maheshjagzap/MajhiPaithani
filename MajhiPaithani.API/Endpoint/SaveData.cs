@@ -59,6 +59,29 @@ namespace MajhiPaithani.API.Endpoint
             .WithTags("SaveData");
 
 
+            savedata.MapPost("/AddProductdeatils", async ([FromBody] ProductDto dto, [FromHeader(Name = "UserId")] int? userId,
+            [FromHeader(Name = "RoleId")] int? roleId, [FromServices] SaveSellerService service) =>
+            {
+                try
+                {
+                    var message = await service.AddProdudctinfoasync(dto, userId, roleId);
+
+                    return Results.Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = message,
+                        Data = dto
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(detail: $"Error: {ex.Message}");
+                }
+            })
+            .WithName("Addprodcutdeatils")
+            .WithTags("SaveData");
+
+
 
 
 
