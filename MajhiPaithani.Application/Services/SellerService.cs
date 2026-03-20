@@ -22,10 +22,15 @@ namespace MajhiPaithani.Application.Services
             return await _dataAccess.ExecuteSellerAsync(dto,UserId,RoleId);
         }
 
-
+        
         public async Task<string> updatebankdeatils(BankDto dto, int? UserId, int? RoleId)
         {
             return await _dataAccess.UpdatesellerBankdeatilsasync(dto,UserId,RoleId);
+        }
+
+        public async Task<string> AddProdudctinfoasync(ProductDto dto, int? UserId, int? RoleId)
+        {
+            return await _dataAccess.AddPrductinformation(dto, UserId, RoleId);
         }
     }
 }

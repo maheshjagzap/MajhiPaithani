@@ -102,6 +102,47 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
+        public async Task<string> AddPrductinformation(ProductDto dto, int? UserId, int? RoleId)
+        {
+            string message = "";
+
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                using (var cmd = new SqlCommand("Proc_SaveData", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var json = System.Text.Json.JsonSerializer.Serialize(dto);
+
+                    cmd.Parameters.AddWithValue("@JsonData", json);
+                    cmd.Parameters.AddWithValue("@TaskID", dto.Taskid);
+                    cmd.Parameters.AddWithValue("@RequestedFor", dto.RequestedFor);
+                    cmd.Parameters.AddWithValue("@headerUserID", UserId);
+                    cmd.Parameters.AddWithValue("@headerRoleid", RoleId);
+
+                    await conn.OpenAsync();
+
+                    using var reader = await cmd.ExecuteReaderAsync();
+
+                    if (await reader.ReadAsync())
+                    {
+                        message = reader["Message"]?.ToString();
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                message = $"SQL Error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+
+            return message;
+        }
+
 
     }
 }
