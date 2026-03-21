@@ -64,12 +64,13 @@ namespace MajhiPaithani.API.Endpoint
             {
                 try
                 {
-                    var message = await service.AddProdudctinfoasync(dto, userId, roleId);
+                    var responce = await service.AddProdudctinfoasync(dto, userId, roleId);
 
                     return Results.Ok(new
                     {
                         StatusCode = StatusCodes.Status200OK,
-                        Message = message,
+                        Message = responce.Message,
+                        ProductId= responce.ProductId,
                         Data = dto
                     });
                 }

@@ -1,5 +1,6 @@
 ﻿using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Models.Request;
+using MajhiPaithani.Application.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace MajhiPaithani.Application.Services
             return await _dataAccess.UpdatesellerBankdeatilsasync(dto,UserId,RoleId);
         }
 
-        public async Task<string> AddProdudctinfoasync(ProductDto dto, int? UserId, int? RoleId)
+        public async Task<ProductAddresponce> AddProdudctinfoasync(ProductDto dto, int? UserId, int? RoleId)
         {
             return await _dataAccess.AddPrductinformation(dto, UserId, RoleId);
         }
