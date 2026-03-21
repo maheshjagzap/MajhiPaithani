@@ -23,5 +23,10 @@ namespace MajhiPaithani.Application.Services
 
             return await _dataAccess.ExecuteProductImagesAsync(fileUrls, productid,userId);
         }
+
+        public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
+        {
+            return await _dataAccess.GetProductImagesAsync(userId);
+        }
     }
 }

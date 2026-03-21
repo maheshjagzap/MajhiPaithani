@@ -69,7 +69,31 @@ namespace MajhiPaithani.API.Endpoint
 .DisableAntiforgery();
 
 
+            app.MapGet("api/get/product-images", async (
+    int userId,
+    AddProductImageservice service) =>
+            {
+                try
+                {
+                    var data = await service.GetProductImagesAsync(userId);
+
+                    return Results.Ok(new
+                    {
+                        StatusCode = 200,
+                        Message = "Product data fetched successfully",
+                        Data = data
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"Error: {ex.Message}");
+                }
+            })
+.WithName("GetProductImages")
+.WithTags("Products");
+
         }
+
     }
 }
 

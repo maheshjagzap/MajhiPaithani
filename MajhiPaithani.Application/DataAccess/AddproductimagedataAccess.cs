@@ -65,6 +65,51 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
+        public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
+        {
+            var list = new List<ProductImageDto>();
+
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("AddProductImageData", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@taskid", 0);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                await conn.OpenAsync();
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new ProductImageDto
+                    {
+                        iProductId = Convert.ToInt32(reader["iProductId"]),
+                        iSellerId = Convert.ToInt32(reader["iSellerId"]),
+                        iCategoryId = Convert.ToInt32(reader["iCategoryId"]),
+                        sProductTitle = reader["sProductTitle"]?.ToString(),
+                        sDescription = reader["sDescription"]?.ToString(),
+                        dcBasePrice = Convert.ToDecimal(reader["dcBasePrice"]),
+                        sColor = reader["sColor"]?.ToString(),
+                        sFabric = reader["sFabric"]?.ToString(),
+                        sDesignType = reader["sDesignType"]?.ToString(),
+                        bIsCustomizationAvailable = Convert.ToBoolean(reader["bIsCustomizationAvailable"]),
+                        bIsActive = Convert.ToBoolean(reader["bIsActive"]),
+                        bIsDeleted = Convert.ToBoolean(reader["bIsDeleted"]),
+                        ProductCreatedDate = Convert.ToDateTime(reader["ProductCreatedDate"]),
+                        ProductUpdatedDate = reader["ProductUpdatedDate"] as DateTime?,
+
+                        iImageId = reader["iImageId"] as int?,
+                        sImageUrl = reader["sImageUrl"]?.ToString(),
+                        bIsPrimary = reader["bIsPrimary"] as bool?,
+                        ImageCreatedDate = reader["ImageCreatedDate"] as DateTime?
+                    });
+                }
+            }
+
+            return list;
+        }
 
     }
 }
