@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MajhiPaithani.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 
@@ -14,6 +15,14 @@ public partial class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Remove<ForeignKeyAttributeConvention>();
+        configurationBuilder.Conventions.Remove<ForeignKeyIndexConvention>();
+        configurationBuilder.Conventions.Remove<NavigationEagerLoadingConvention>();
+        configurationBuilder.Conventions.Remove<RelationshipDiscoveryConvention>();
     }
 
     public virtual DbSet<AdminLog> AdminLogs { get; set; }
@@ -336,6 +345,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("dcTotalAmount");
             entity.Property(e => e.ICustomerId).HasColumnName("iCustomerId");
+            entity.Property(e => e.UserId).HasColumnName("UserId");
             entity.Property(e => e.SOrderStatus)
                 .HasMaxLength(50)
                 .HasColumnName("sOrderStatus");
@@ -646,6 +656,7 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.DDeletedDate).HasColumnName("dDeletedDate");
             entity.Property(e => e.DUpdatedDate).HasColumnName("dUpdatedDate");
             entity.Property(e => e.IRoleId).HasColumnName("iRoleId");
+            entity.Property(e => e.IsSellerProfileComplete).HasColumnName("IsSellerProfileComplete");
             entity.Property(e => e.SEmail)
                 .HasMaxLength(255)
                 .HasColumnName("sEmail");

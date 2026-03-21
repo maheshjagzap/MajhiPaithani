@@ -7,13 +7,13 @@ public partial class SellerBankDetail
 {
     public int IbankDetailId { get; set; }
 
-    public int IsellerId { get; set; }
+    public int? IsellerId { get; set; }
 
-    public string SaccountHolderName { get; set; } = null!;
+    public string? SaccountHolderName { get; set; }
 
-    public string SaccountNumber { get; set; } = null!;
+    public string? SaccountNumber { get; set; }
 
-    public string Sifsccode { get; set; } = null!;
+    public string? Sifsccode { get; set; }
 
     public string? SbankName { get; set; }
 

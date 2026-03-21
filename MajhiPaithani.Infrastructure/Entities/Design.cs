@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MajhiPaithani.Infrastructure.Entities
 {
@@ -12,7 +8,7 @@ namespace MajhiPaithani.Infrastructure.Entities
         [Key]
         public int IDesignId { get; set; }
 
-        public int ISellerId { get; set; }
+        public int? ISellerId { get; set; }
 
         public string? SDesignName { get; set; }
 
@@ -28,8 +24,6 @@ namespace MajhiPaithani.Infrastructure.Entities
 
         public bool? BIsDeleted { get; set; }
 
-        // Navigation Property
 
-        public virtual Seller? Seller { get; set; }
     }
 }

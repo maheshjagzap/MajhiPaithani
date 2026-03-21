@@ -2,7 +2,7 @@
 {
     public int BankDetailId { get; set; }
 
-    public int SellerId { get; set; }
+    public int? SellerId { get; set; }
 
     public string AccountHolderName { get; set; }
 

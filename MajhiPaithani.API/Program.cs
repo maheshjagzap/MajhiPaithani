@@ -112,5 +112,5 @@ SaveData.Map(app);
 GetSellerDashboard.Map(app);
 UploadPoductimage.Map(app);
 
-//app.Run();
-app.Run("http://0.0.0.0:8080");
+app.Run();
+//app.Run("http://0.0.0.0:8080");

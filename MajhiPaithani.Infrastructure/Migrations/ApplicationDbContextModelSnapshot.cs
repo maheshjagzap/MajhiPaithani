@@ -461,7 +461,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     b.Property<DateTime?>("DUpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ISellerId")
+                    b.Property<int?>("ISellerId")
                         .HasColumnType("int");
 
                     b.Property<string>("SDescription")
@@ -476,12 +476,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     b.Property<string>("SImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SellerISellerId")
-                        .HasColumnType("int");
-
                     b.HasKey("IDesignId");
-
-                    b.HasIndex("SellerISellerId");
 
                     b.ToTable("Designs");
                 });
@@ -625,8 +620,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("sPaymentStatus");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserId");
 
                     b.HasKey("IOrderId")
                         .HasName("PK__Orders__F354140FD000231A");
@@ -855,6 +851,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("sImageUrl");
 
+                    b.Property<int>("sellerId")
+                        .HasColumnType("int");
+
                     b.HasKey("IImageId")
                         .HasName("PK__ProductI__EEA8AE34B628B178");
 
@@ -992,17 +991,15 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("StockAvailable")
+                    b.Property<int?>("StockAvailable")
                         .HasColumnType("int");
 
                     b.HasKey("ProductId");
@@ -1032,7 +1029,6 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("SRoleName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("sRoleName");
@@ -1082,7 +1078,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ISellerId"));
 
-                    b.Property<bool>("BIsActive")
+                    b.Property<bool?>("BIsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true)
@@ -1114,11 +1110,11 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("dUpdatedDate");
 
-                    b.Property<int>("ILocationId")
+                    b.Property<int?>("ILocationId")
                         .HasColumnType("int")
                         .HasColumnName("iLocationId");
 
-                    b.Property<int>("IUserId")
+                    b.Property<int?>("IUserId")
                         .HasColumnType("int")
                         .HasColumnName("iUserId");
 
@@ -1175,18 +1171,16 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("datetime")
                         .HasColumnName("DUpdatedDate");
 
-                    b.Property<int>("IsellerId")
+                    b.Property<int?>("IsellerId")
                         .HasColumnType("int")
                         .HasColumnName("ISellerId");
 
                     b.Property<string>("SaccountHolderName")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("SAccountHolderName");
 
                     b.Property<string>("SaccountNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("SAccountNumber");
@@ -1196,19 +1190,13 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("SBankName");
 
-                    b.Property<int?>("SellerISellerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Sifsccode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("SIFSCCode");
 
                     b.HasKey("IbankDetailId")
                         .HasName("PK__SellerBa__AD3D267EE3DBF786");
-
-                    b.HasIndex("SellerISellerId");
 
                     b.ToTable("SellerBankDetails");
                 });
@@ -1327,12 +1315,13 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("dUpdatedDate");
 
-                    b.Property<int>("IRoleId")
+                    b.Property<int?>("IRoleId")
                         .HasColumnType("int")
                         .HasColumnName("iRoleId");
 
-                    b.Property<bool>("IsSellerProfileComplete")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("IsSellerProfileComplete")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsSellerProfileComplete");
 
                     b.Property<string>("SEmail")
                         .HasMaxLength(255)
@@ -1392,27 +1381,6 @@ namespace MajhiPaithani.Infrastructure.Migrations
                         .HasName("PK__Wishlist__AD0A7D289C37FC4F");
 
                     b.ToTable("Wishlist", (string)null);
-                });
-
-            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Design", b =>
-                {
-                    b.HasOne("MajhiPaithani.Infrastructure.Entities.Seller", "Seller")
-                        .WithMany()
-                        .HasForeignKey("SellerISellerId");
-
-                    b.Navigation("Seller");
-                });
-
-            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.SellerBankDetail", b =>
-                {
-                    b.HasOne("MajhiPaithani.Infrastructure.Entities.Seller", null)
-                        .WithMany("SellerBankDetails")
-                        .HasForeignKey("SellerISellerId");
-                });
-
-            modelBuilder.Entity("MajhiPaithani.Infrastructure.Entities.Seller", b =>
-                {
-                    b.Navigation("SellerBankDetails");
                 });
 #pragma warning restore 612, 618
         }

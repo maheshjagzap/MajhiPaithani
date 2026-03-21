@@ -7,7 +7,7 @@ public partial class Role
 {
     public int IRoleId { get; set; }
 
-    public string SRoleName { get; set; } = null!;
+    public string? SRoleName { get; set; }
 
     public bool? BIsActive { get; set; }
 

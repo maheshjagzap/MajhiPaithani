@@ -6,7 +6,7 @@ namespace MajhiPaithani.Infrastructure.Entities;
 public partial class Order
 {
     public int IOrderId { get; set; }
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 
     public int? ICustomerId { get; set; }
 

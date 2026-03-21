@@ -11,9 +11,9 @@ namespace MajhiPaithani.Infrastructure.Entities
     {
         [Key]
         public int ProductId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int StockAvailable { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public decimal? Price { get; set; }
+        public int? StockAvailable { get; set; }
     }
 }
