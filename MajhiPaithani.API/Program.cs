@@ -94,12 +94,18 @@ var app = builder.Build();
 
 // 1st: Catch all errors and turn them into clean JSON
 app.UseMiddleware<ExceptionMiddleware>();
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//     FileProvider = new PhysicalFileProvider(
-//         Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "UploadedproductImages")),
-//     RequestPath = "/UploadedproductImages"
-// });
+var uploadPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "UploadedproductImages");
+
+if (!Directory.Exists(uploadPath))
+{
+    Directory.CreateDirectory(uploadPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadPath),
+    RequestPath = "/UploadedproductImages"
+});
 
 // 2nd: Security & Swagger
 app.UseHttpsRedirection();
@@ -110,7 +116,7 @@ app.UseSwaggerUI();
 // 3rd: Identity (Auth must be BEFORE MapControllers)
 app.UseAuthentication();
 app.UseAuthorization();
-// app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
+app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
 
 // 4th: Routing
 app.MapControllers();
