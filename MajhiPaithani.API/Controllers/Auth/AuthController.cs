@@ -1,6 +1,7 @@
 ﻿using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Models.Request;
 using MajhiPaithani.Application.Models.Request.MajhiPaithani.Application.Models.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -25,7 +26,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LoginAsync(LoginRequest request)
     {
         var result = await _authService.LoginAsync(request);
+        return Ok(result);
+    }
 
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        var result = await _authService.ChangePasswordAsync(request);
         return Ok(result);
     }
 }

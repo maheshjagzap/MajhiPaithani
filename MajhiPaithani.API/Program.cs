@@ -127,5 +127,14 @@ SaveData.Map(app);
 GetSellerDashboard.Map(app);
 UploadPoductimage.Map(app);
 
-//app.Run();
-app.Run("http://0.0.0.0:8080");
+
+if (app.Environment.IsDevelopment())
+{
+    // When running locally (IIS Express/Kestrel)
+    app.Run();
+}
+else
+{
+    // When running on the server/Docker
+    app.Run("http://0.0.0.0:8080");
+}

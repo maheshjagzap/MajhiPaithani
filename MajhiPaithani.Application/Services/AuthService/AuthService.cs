@@ -96,7 +96,7 @@ public class AuthService : IAuthService
         return new LoginResponse
         {
             UserId = user.IUserId,
-            Name = user.SFirstName,
+            Name = user.SFirstName + " " + user.SLastName,
             Email = user.SEmail,
             PhoneNumber = user.SPhoneNumber,
             Role = role,
@@ -108,4 +108,34 @@ public class AuthService : IAuthService
             Message = "Login successful"
         };
     }
+
+    public async Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.IUserId == request.UserId);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        // Check old password (plain text for testing)
+        if (user.SPasswordHash != request.oldPassword)
+        {
+            throw new UnauthorizedException("Old password is incorrect");
+        }
+
+        // Update new password (plain text for now)
+        user.SPasswordHash = request.NewPassword;
+        user.DUpdatedDate = DateTime.UtcNow;
+
+        // Save changes
+        await _context.SaveChangesAsync();
+
+        return new ChangePasswordResponse
+        {
+            Message = "Password changed successfully"
+        };
+    }
 }
+
