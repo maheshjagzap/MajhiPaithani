@@ -23,10 +23,14 @@ namespace MajhiPaithani.Application.Models.Request
         public DateTime ProductCreatedDate { get; set; }
         public DateTime? ProductUpdatedDate { get; set; }
 
+        // ✅ Nested list of images
+        public List<ProductImageItemDto> Images { get; set; }
+    }
 
+    public class ProductImageItemDto
+    {
         public int? iImageId { get; set; }
         public string sImageUrl { get; set; }
         public bool? bIsPrimary { get; set; }
-        public DateTime? ImageCreatedDate { get; set; }
     }
 }

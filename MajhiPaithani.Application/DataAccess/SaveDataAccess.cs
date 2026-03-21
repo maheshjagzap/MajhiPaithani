@@ -1,4 +1,5 @@
 ﻿using MajhiPaithani.Application.Models.Request;
+using MajhiPaithani.Application.Models.Response;
 using MajhiPaithani.Infrastructure.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -102,9 +103,9 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
-        public async Task<string> AddPrductinformation(ProductDto dto, int? UserId, int? RoleId)
+        public async Task<ProductAddresponce> AddPrductinformation(ProductDto dto, int? UserId, int? RoleId)
         {
-            string message = "";
+            var response = new ProductAddresponce();
 
             try
             {
@@ -115,11 +116,11 @@ namespace MajhiPaithani.Application.DataAccess
 
                     var json = System.Text.Json.JsonSerializer.Serialize(dto);
 
-                    cmd.Parameters.AddWithValue("@JsonData", json);
-                    cmd.Parameters.AddWithValue("@TaskID", dto.Taskid);
-                    cmd.Parameters.AddWithValue("@RequestedFor", dto.RequestedFor);
-                    cmd.Parameters.AddWithValue("@headerUserID", UserId);
-                    cmd.Parameters.AddWithValue("@headerRoleid", RoleId);
+                    cmd.Parameters.Add("@JsonData", SqlDbType.NVarChar).Value = json;
+                    cmd.Parameters.Add("@TaskID", SqlDbType.Int).Value = dto.Taskid;
+                    cmd.Parameters.Add("@RequestedFor", SqlDbType.Int).Value = dto.RequestedFor;
+                    cmd.Parameters.Add("@headerUserID", SqlDbType.Int).Value = (object)UserId ?? DBNull.Value;
+                    cmd.Parameters.Add("@headerRoleid", SqlDbType.Int).Value = (object)RoleId ?? DBNull.Value;
 
                     await conn.OpenAsync();
 
@@ -127,20 +128,25 @@ namespace MajhiPaithani.Application.DataAccess
 
                     if (await reader.ReadAsync())
                     {
-                        message = reader["Message"]?.ToString();
+                        response.Message = reader["Message"]?.ToString();
+
+                        if (reader["ProductId"] != DBNull.Value)
+                        {
+                            response.ProductId = Convert.ToInt32(reader["ProductId"]);
+                        }
                     }
                 }
             }
             catch (SqlException ex)
             {
-                message = $"SQL Error: {ex.Message}";
+                response.Message = $"SQL Error: {ex.Message}";
             }
             catch (Exception ex)
             {
-                message = $"Error: {ex.Message}";
+                response.Message = $"Error: {ex.Message}";
             }
 
-            return message;
+            return response;
         }
 
 

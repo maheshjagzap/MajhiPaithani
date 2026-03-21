@@ -11,10 +11,10 @@ namespace MajhiPaithani.API.Endpoint
     {
         public static void Map(WebApplication app)
         {
-            var product = app.MapGroup("/api/Dropdown");
+            var product = app.MapGroup("/api/Product");
 
 
-            app.MapPost("api/upload/images", async (
+            product.MapPost("api/upload/images", async (
     [FromForm] int? ProdcutId,
     [FromForm] int?  userId,
     [FromForm] IFormFileCollection Files,
@@ -69,7 +69,7 @@ namespace MajhiPaithani.API.Endpoint
 .DisableAntiforgery();
 
 
-            app.MapGet("api/get/product-images", async (
+            product.MapGet("/GetAllProductdata", async (
     int userId,
     AddProductImageservice service) =>
             {
@@ -90,7 +90,7 @@ namespace MajhiPaithani.API.Endpoint
                 }
             })
 .WithName("GetProductImages")
-.WithTags("Products");
+.WithTags("Prodcuts");
 
         }
 

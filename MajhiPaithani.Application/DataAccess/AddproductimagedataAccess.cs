@@ -1,6 +1,7 @@
 ﻿using MajhiPaithani.Application.Models.Request;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,10 +15,13 @@ namespace MajhiPaithani.Application.DataAccess
     public class AddproductimagedataAccess
     {
         private readonly string _connectionString;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AddproductimagedataAccess(IConfiguration configuration)
+
+        public AddproductimagedataAccess(IConfiguration configuration, IHttpContextAccessor _httpContextAccessor)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
+            httpContextAccessor = _httpContextAccessor;
         }
 
         public async Task<string> ExecuteProductImagesAsync(List<string> fileUrls, int productid, int userId)
@@ -67,7 +71,8 @@ namespace MajhiPaithani.Application.DataAccess
 
         public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
         {
-            var list = new List<ProductImageDto>();
+            var productDict = new Dictionary<int, ProductImageDto>();
+            var baseUrl = GetBaseUrl();
 
             using (var conn = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand("AddProductImageData", conn))
@@ -83,33 +88,74 @@ namespace MajhiPaithani.Application.DataAccess
 
                 while (await reader.ReadAsync())
                 {
-                    list.Add(new ProductImageDto
-                    {
-                        iProductId = Convert.ToInt32(reader["iProductId"]),
-                        iSellerId = Convert.ToInt32(reader["iSellerId"]),
-                        iCategoryId = Convert.ToInt32(reader["iCategoryId"]),
-                        sProductTitle = reader["sProductTitle"]?.ToString(),
-                        sDescription = reader["sDescription"]?.ToString(),
-                        dcBasePrice = Convert.ToDecimal(reader["dcBasePrice"]),
-                        sColor = reader["sColor"]?.ToString(),
-                        sFabric = reader["sFabric"]?.ToString(),
-                        sDesignType = reader["sDesignType"]?.ToString(),
-                        bIsCustomizationAvailable = Convert.ToBoolean(reader["bIsCustomizationAvailable"]),
-                        bIsActive = Convert.ToBoolean(reader["bIsActive"]),
-                        bIsDeleted = Convert.ToBoolean(reader["bIsDeleted"]),
-                        ProductCreatedDate = Convert.ToDateTime(reader["ProductCreatedDate"]),
-                        ProductUpdatedDate = reader["ProductUpdatedDate"] as DateTime?,
+                    int productId = Convert.ToInt32(reader["iProductId"]);
 
-                        iImageId = reader["iImageId"] as int?,
-                        sImageUrl = reader["sImageUrl"]?.ToString(),
-                        bIsPrimary = reader["bIsPrimary"] as bool?,
-                        ImageCreatedDate = reader["ImageCreatedDate"] as DateTime?
-                    });
+                    if (!productDict.ContainsKey(productId))
+                    {
+                        var product = new ProductImageDto
+                        {
+                            iProductId = productId,
+                            iSellerId = Convert.ToInt32(reader["iSellerId"]),
+                            iCategoryId = Convert.ToInt32(reader["iCategoryId"]),
+                            sProductTitle = reader["sProductTitle"]?.ToString(),
+                            sDescription = reader["sDescription"]?.ToString(),
+                            dcBasePrice = Convert.ToDecimal(reader["dcBasePrice"]),
+                            sColor = reader["sColor"]?.ToString(),
+                            sFabric = reader["sFabric"]?.ToString(),
+                            sDesignType = reader["sDesignType"]?.ToString(),
+                            bIsCustomizationAvailable = Convert.ToBoolean(reader["bIsCustomizationAvailable"]),
+                            bIsActive = Convert.ToBoolean(reader["bIsActive"]),
+                            bIsDeleted = Convert.ToBoolean(reader["bIsDeleted"]),
+                            ProductCreatedDate = Convert.ToDateTime(reader["ProductCreatedDate"]),
+                            ProductUpdatedDate = reader["ProductUpdatedDate"] == DBNull.Value
+                                ? (DateTime?)null
+                                : Convert.ToDateTime(reader["ProductUpdatedDate"]),
+                            Images = new List<ProductImageItemDto>()
+                        };
+
+                        // ✅ Get aggregated strings
+                        var imageUrls = reader["sImageUrl"]?.ToString();
+                        var imageIds = reader["ImageIds"]?.ToString();
+                        var isPrimaryFlags = reader["IsPrimaryFlags"]?.ToString();
+
+                        if (!string.IsNullOrEmpty(imageUrls))
+                        {
+                            var urlList = imageUrls.Split(',');
+                            var idList = imageIds?.Split(',');
+                            var primaryList = isPrimaryFlags?.Split(',');
+
+                            for (int i = 0; i < urlList.Length; i++)
+                            {
+                                product.Images.Add(new ProductImageItemDto
+                                {
+                                    iImageId = (idList != null && i < idList.Length) ? Convert.ToInt32(idList[i]) : 0,
+                                    sImageUrl = baseUrl + urlList[i],
+                                    bIsPrimary = (primaryList != null && i < primaryList.Length)? Convert.ToInt32(primaryList[i]) == 1: (bool?)null
+                                });
+                            }
+                        }
+
+                        productDict[productId] = product;
+                    }
                 }
             }
 
-            return list;
+            return productDict.Values.ToList();
         }
+
+
+        public string GetBaseUrl()
+        {
+            var request = httpContextAccessor.HttpContext?.Request;
+            if (request == null)
+            {
+                return string.Empty; 
+            }
+
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+            return baseUrl;
+        }
+
 
     }
 }
