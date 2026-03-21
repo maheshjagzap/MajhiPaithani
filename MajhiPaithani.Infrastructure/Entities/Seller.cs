@@ -7,7 +7,7 @@ public partial class Seller
 {
     public int ISellerId { get; set; }
 
-    public int IUserId { get; set; }
+    public int? IUserId { get; set; }
 
     public string? SShopName { get; set; }
 
@@ -25,11 +25,11 @@ public partial class Seller
 
     public string? SProfileImageUrl { get; set; }
 
-    public int ILocationId { get; set; }
+    public int? ILocationId { get; set; }
 
     public bool? BIsVerified { get; set; }
 
-    public bool BIsActive { get; set; }
+    public bool? BIsActive { get; set; }
 
     public bool? BIsDeleted { get; set; }
 
@@ -39,7 +39,5 @@ public partial class Seller
 
     public DateTime? DDeletedDate { get; set; }
 
-    // Navigation Properties (optional but recommended)
 
-    public virtual ICollection<SellerBankDetail> SellerBankDetails { get; set; } = new List<SellerBankDetail>();
 }

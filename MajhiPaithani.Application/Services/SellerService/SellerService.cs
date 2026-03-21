@@ -52,10 +52,10 @@ namespace MajhiPaithani.Infrastructure.Services
             return new RegisterSellerResponse
             {
                 iSellerId = seller.ISellerId,
-                iUserId = seller.IUserId,
+                iUserId = seller.IUserId ?? 0,
                 sShopName = seller.SShopName,
                 //bIsVerified = seller.BIsVerified,
-                bIsActive = seller.BIsActive,
+                bIsActive = seller.BIsActive ?? false,
                 sMessage = "Seller registered successfully. Waiting for admin approval."
             };
         }
@@ -70,12 +70,12 @@ namespace MajhiPaithani.Infrastructure.Services
             return new GetSellerProfileResponse
             {
                 iSellerId = seller.ISellerId,
-                iUserId = seller.IUserId,
+                iUserId = seller.IUserId ?? 0,
                 sShopName = seller.SShopName,
                 sShopDescription = seller.SShopDescription,
-                iLocationId = seller.ILocationId,
-                bIsVerified = seller.BIsVerified,
-                bIsActive = seller.BIsActive
+                iLocationId = seller.ILocationId ?? 0,
+                bIsVerified = seller.BIsVerified ?? false,
+                bIsActive = seller.BIsActive ?? false
             };
         }
         public async Task<string> UpdateSellerProfileAsync(int sellerId, UpdateSellerProfileRequest request)
@@ -89,7 +89,7 @@ namespace MajhiPaithani.Infrastructure.Services
             if (seller == null)
                 throw new NotFoundException("Seller not found");
 
-            if (!seller.BIsActive)
+            if (seller.BIsActive != true)
                 throw new InactiveAccountException("Seller account is inactive");
 
             if (string.IsNullOrWhiteSpace(request.sShopName))
@@ -334,7 +334,7 @@ namespace MajhiPaithani.Infrastructure.Services
             return new AddDesignResponse
             {
                 DesignId = design.IDesignId,
-                SellerId = design.ISellerId,
+                SellerId = design.ISellerId ?? 0,
                 DesignName = design.SDesignName,
                 CreatedDate = design.DCreatedDate.Value,
                 Message = "Design uploaded successfully"
@@ -353,7 +353,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .Select(x => new GetSellerDesignsResponse
                 {
                     DesignId = x.IDesignId,
-                    SellerId = x.ISellerId,
+                    SellerId = x.ISellerId ?? 0,
                     DesignName = x.SDesignName,
                     DesignType = x.SDesignType,
                     Description = x.SDescription,
@@ -385,7 +385,7 @@ namespace MajhiPaithani.Infrastructure.Services
                     "wwwroot",
                     "uploads",
                     "designs",
-                    design.ISellerId.ToString());
+                    (design.ISellerId ?? 0).ToString());
 
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
@@ -401,7 +401,7 @@ namespace MajhiPaithani.Infrastructure.Services
                     await request.ImageFile.CopyToAsync(stream);
                 }
 
-                design.SImageUrl = $"/uploads/designs/{design.ISellerId}/{fileName}";
+                design.SImageUrl = $"/uploads/designs/{design.ISellerId ?? 0}/{fileName}";
             }
 
             design.DUpdatedDate = DateTime.UtcNow;
@@ -442,7 +442,7 @@ namespace MajhiPaithani.Infrastructure.Services
                 .Select(x => new DesignDetailsResponse
                 {
                     DesignId = x.IDesignId,
-                    SellerId = x.ISellerId,
+                    SellerId = x.ISellerId ?? 0,
                     DesignName = x.SDesignName,
                     DesignType = x.SDesignType,
                     Description = x.SDescription,
@@ -490,7 +490,7 @@ namespace MajhiPaithani.Infrastructure.Services
             return new AddProductResponse
             {
                 ProductId = product.IProductId,
-                SellerId = product.ISellerId.Value,
+                SellerId = product.ISellerId ?? 0,
                 ProductName = product.SProductTitle,
                 CreatedDate = product.DCreatedDate.Value,
                 Message = "Product created successfully"

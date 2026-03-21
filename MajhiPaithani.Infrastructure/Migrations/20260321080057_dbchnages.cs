@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MajhiPaithani.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class dbchangesdone : Migration
+    public partial class dbchnages : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -188,6 +188,26 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Designs",
+                columns: table => new
+                {
+                    IDesignId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ISellerId = table.Column<int>(type: "int", nullable: true),
+                    SDesignName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SDesignType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    BIsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Designs", x => x.IDesignId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Locations",
                 columns: table => new
                 {
@@ -263,7 +283,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 {
                     iOrderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
                     iCustomerId = table.Column<int>(type: "int", nullable: true),
                     dcTotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     sOrderStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -301,10 +321,10 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 {
                     ProductId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    StockAvailable = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    StockAvailable = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -320,6 +340,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     iProductId = table.Column<int>(type: "int", nullable: true),
                     sImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     bIsPrimary = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
+                    sellerId = table.Column<int>(type: "int", nullable: false),
                     dCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())")
                 },
                 constraints: table =>
@@ -420,7 +441,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 {
                     iRoleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    sRoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    sRoleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     bIsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
                     dCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())")
                 },
@@ -442,6 +463,25 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__SearchHi__1D51F56AC4A9082D", x => x.iSearchId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SellerBankDetails",
+                columns: table => new
+                {
+                    IBankDetailId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ISellerId = table.Column<int>(type: "int", nullable: true),
+                    SAccountHolderName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    SAccountNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    SIFSCCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    SBankName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    DCreatedDate = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getutcdate())"),
+                    DUpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__SellerBa__AD3D267EE3DBF786", x => x.IBankDetailId);
                 });
 
             migrationBuilder.CreateTable(
@@ -484,7 +524,7 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 {
                     iSellerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    iUserId = table.Column<int>(type: "int", nullable: false),
+                    iUserId = table.Column<int>(type: "int", nullable: true),
                     sShopName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     sShopDescription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     SShopAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -493,9 +533,9 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     SPincode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SBusinessDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SProfileImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    iLocationId = table.Column<int>(type: "int", nullable: false),
+                    iLocationId = table.Column<int>(type: "int", nullable: true),
                     bIsVerified = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    bIsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    bIsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
                     bIsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
                     dCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())"),
                     dUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -517,8 +557,8 @@ namespace MajhiPaithani.Infrastructure.Migrations
                     sEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     sPhoneNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     sPasswordHash = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    IsSellerProfileComplete = table.Column<bool>(type: "bit", nullable: false),
-                    iRoleId = table.Column<int>(type: "int", nullable: false),
+                    IsSellerProfileComplete = table.Column<bool>(type: "bit", nullable: true),
+                    iRoleId = table.Column<int>(type: "int", nullable: true),
                     bIsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
                     bIsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
                     dCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())"),
@@ -544,67 +584,6 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK__Wishlist__AD0A7D289C37FC4F", x => x.iWishlistId);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "Designs",
-                columns: table => new
-                {
-                    IDesignId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ISellerId = table.Column<int>(type: "int", nullable: false),
-                    SDesignName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SDesignType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    BIsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    SellerISellerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Designs", x => x.IDesignId);
-                    table.ForeignKey(
-                        name: "FK_Designs_Sellers_SellerISellerId",
-                        column: x => x.SellerISellerId,
-                        principalTable: "Sellers",
-                        principalColumn: "iSellerId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SellerBankDetails",
-                columns: table => new
-                {
-                    IBankDetailId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ISellerId = table.Column<int>(type: "int", nullable: false),
-                    SAccountHolderName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    SAccountNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SIFSCCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    SBankName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    DCreatedDate = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getutcdate())"),
-                    DUpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    SellerISellerId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__SellerBa__AD3D267EE3DBF786", x => x.IBankDetailId);
-                    table.ForeignKey(
-                        name: "FK_SellerBankDetails_Sellers_SellerISellerId",
-                        column: x => x.SellerISellerId,
-                        principalTable: "Sellers",
-                        principalColumn: "iSellerId");
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Designs_SellerISellerId",
-                table: "Designs",
-                column: "SellerISellerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SellerBankDetails_SellerISellerId",
-                table: "SellerBankDetails",
-                column: "SellerISellerId");
         }
 
         /// <inheritdoc />
@@ -698,13 +677,13 @@ namespace MajhiPaithani.Infrastructure.Migrations
                 name: "SellerReviews");
 
             migrationBuilder.DropTable(
+                name: "Sellers");
+
+            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Wishlist");
-
-            migrationBuilder.DropTable(
-                name: "Sellers");
         }
     }
 }
