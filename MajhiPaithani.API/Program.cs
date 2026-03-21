@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Text;
-using MajhiPaithani.API.Endpoint;
+﻿using MajhiPaithani.API.Endpoint;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Interfaces.IAuthService;
@@ -11,7 +9,10 @@ using MajhiPaithani.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -50,7 +51,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
+builder.Services.AddHttpContextAccessor();
 // Authentication & JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -86,12 +87,19 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
+
 var app = builder.Build();
 
 // --- 2. CONFIGURE MIDDLEWARE PIPELINE (The Order Matters!) ---
 
 // 1st: Catch all errors and turn them into clean JSON
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "UploadedproductImages")),
+    RequestPath = "/UploadedproductImages"
+});
 
 // 2nd: Security & Swagger
 app.UseHttpsRedirection();
@@ -102,6 +110,7 @@ app.UseSwaggerUI();
 // 3rd: Identity (Auth must be BEFORE MapControllers)
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
 
 // 4th: Routing
 app.MapControllers();
