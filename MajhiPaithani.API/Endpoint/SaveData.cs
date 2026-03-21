@@ -33,7 +33,7 @@ namespace MajhiPaithani.API.Endpoint
                 }
             })
             .WithName("SaveSeller")
-            .WithTags("SaveData");
+            .WithTags("Addsellerdata");
 
 
             savedata.MapPost("/Savesellerbankdeatils", async ([FromBody] BankDto dto, [FromHeader(Name = "UserId")] int? userId,
@@ -56,7 +56,7 @@ namespace MajhiPaithani.API.Endpoint
                 }
             })
             .WithName("SaveSellerbankdeatils")
-            .WithTags("SaveData");
+            .WithTags("Addsellerdata");
 
 
             savedata.MapPost("/AddProductdeatils", async ([FromBody] ProductDto dto, [FromHeader(Name = "UserId")] int? userId,
@@ -79,7 +79,7 @@ namespace MajhiPaithani.API.Endpoint
                 }
             })
             .WithName("Addprodcutdeatils")
-            .WithTags("SaveData");
+            .WithTags("Prodcuts");
 
 
 

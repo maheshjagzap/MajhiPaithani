@@ -31,6 +31,8 @@ services.AddScoped<SaveDataAccess>();
 services.AddScoped<SaveSellerService>();
 services.AddScoped<GetSellerDashboardService>();
 services.AddScoped<GetSellerDashboardDataAccess>();
+services.AddScoped<AddproductimagedataAccess>();
+services.AddScoped<AddProductImageservice>();
 
 
 
@@ -65,6 +67,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
+builder.Services.AddSwaggerGen(c =>
+{
+    c.MapType<IFormFile>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
+    });
+});
+
 
 // CORS
 builder.Services.AddCors(options =>
@@ -99,7 +110,7 @@ app.MapControllers();
 Dropdown.Map(app);
 SaveData.Map(app);
 GetSellerDashboard.Map(app);
-
+UploadPoductimage.Map(app);
 
 //app.Run();
 app.Run("http://0.0.0.0:8080");

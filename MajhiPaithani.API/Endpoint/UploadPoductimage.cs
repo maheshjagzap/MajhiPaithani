@@ -1,6 +1,8 @@
-﻿/*using MajhiPaithani.Application.Models.Request;
+﻿using MajhiPaithani.Application.Models.Request;
+using MajhiPaithani.Application.Services;
 using MajhiPaithani.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.IO;
 
 namespace MajhiPaithani.API.Endpoint
@@ -12,76 +14,62 @@ namespace MajhiPaithani.API.Endpoint
             var product = app.MapGroup("/api/Dropdown");
 
 
-            product.MapPost("/uploadProduct",
-       static async (
-           HttpRequest request,
-           [FromForm] UploadProductDto productDto,
-           [FromServices] IProductService service) =>
-       {
-           try
-           {
+            app.MapPost("api/upload/images", async (
+    [FromForm] int? ProdcutId,
+    [FromForm] int?  userId,
+    [FromForm] IFormFileCollection Files,
+    AddProductImageservice service,
+    HttpContext context) =>
+            {
+                try
+                {
+                    if (Files == null || Files.Count == 0)
+                        return Results.BadRequest("No files uploaded.");
 
-               var product = new SaveProductDTO
-               {
-                   SellerId = productDto.iSellerId,
-                   CategoryId = productDto.iCategoryId,
-                   ProductTitle = productDto.sProductTitle,
-                   Description = productDto.sDescription,
-                   BasePrice = productDto.dcBasePrice,
-                   Color = productDto.sColor,
-                   Fabric = productDto.sFabric,
-                   DesignType = productDto.sDesignType,
-                   IsCustomizationAvailable = productDto.bIsCustomizationAvailable,
-                   Stock = productDto.iStock
-               };
+                    var fileUrls = new List<string>();
 
-               string root = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-               string uploadFolder = Path.Combine(root, "ProductImages");
+                    var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    var uploadFolderPath = Path.Combine(wwwRootPath, "UploadedproductImages");
 
-               if (!Directory.Exists(uploadFolder))
-                   Directory.CreateDirectory(uploadFolder);
+                    if (!Directory.Exists(uploadFolderPath))
+                        Directory.CreateDirectory(uploadFolderPath);
 
-               List<string> savedImages = new();
+                    foreach (var file in Files)
+                    {
+                        if (file.Length > 0)
+                        {
+                            var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+                            var filePath = Path.Combine(uploadFolderPath, uniqueFileName);
 
-               if (productDto.ProductImages != null && productDto.ProductImages.Any())
-               {
-                   foreach (var file in productDto.ProductImages)
-                   {
-                       string fileName = $"Product_{Guid.NewGuid()}_{file.FileName}";
-                       string filePath = Path.Combine(uploadFolder, fileName);
+                            using var stream = new FileStream(filePath, FileMode.Create);
+                            await file.CopyToAsync(stream);
 
-                       using var stream = new FileStream(filePath, FileMode.Create);
-                       await file.CopyToAsync(stream);
+                            var relativePath = $"/UploadedproductImages/{uniqueFileName}";
 
-                       savedImages.Add($"/ProductImages/{fileName}");
-                   }
-               }
+                            fileUrls.Add(relativePath);
+                        }
+                    }
 
-               // Convert to CSV (like your docA/docB/docC)
-               string productImages = string.Join(",", savedImages);
+                    await service.SaveProductImagesAsync(fileUrls, ProdcutId ?? 0,userId ?? 0);
 
-               // Save to DB
-               await service.SaveProduct(product, productImages);
-
-               return Results.Ok(new
-               {
-                   StatusCode = StatusCodes.Status200OK,
-                   Message = "Product created successfully",
-                   Images = savedImages
-               });
-           }
-           catch (Exception ex)
-           {
-               return Results.Problem($"Error: {ex.Message}");
-           }
-       })
-       .Accepts<UploadProductDto>("multipart/form-data")
-       .WithName("UploadProduct")
-       .WithTags("Product")
-       .DisableAntiforgery();
-
+                    return Results.Ok(new
+                    {
+                        StatusCode = 200,
+                        Message = "Images uploaded successfully",
+                        Files = fileUrls
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"Error: {ex.Message}");
+                }
+            })
+.WithName("UploaProductImmage")
+.WithTags("Prodcuts")
+.DisableAntiforgery();
 
 
         }
     }
-}*/
+}
+
