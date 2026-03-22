@@ -14,7 +14,7 @@ namespace MajhiPaithani.API.Endpoint
             var product = app.MapGroup("/api/Product");
 
 
-            product.MapPost("api/upload/images", async (
+            product.MapPost("api/uploadimage", async (
     [FromForm] int? ProdcutId,
     [FromForm] int? userId,
     [FromForm] IFormFileCollection Files,
@@ -121,46 +121,64 @@ namespace MajhiPaithani.API.Endpoint
 .Accepts<IFormFile>("multipart/form-data")
 .DisableAntiforgery();
 
-//            product.MapPut("/update/product-image", async(
-//  [FromQuery]  int imageId,
-//   [FromQuery] string? fileUrl,
-//AddProductImageservice service) =>
-//            {
-//                try
-//                {
+            product.MapDelete("/deleteproductimage", async (
+                [FromQuery] int imageId,
+                [FromQuery] string? fileUrl,
+                AddProductImageservice service) =>
+            {
+                try
+                {
+                    var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
+                    if (string.IsNullOrEmpty(fileUrl))
+                    {
+                        return Results.BadRequest(new
+                        {
+                            StatusCode = 400,
+                            Message = "File URL is required"
+                        });
+                    }
 
-//                    var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    var oldFilePath = Path.Combine(wwwRootPath, fileUrl.TrimStart('/'));
 
+                    if (!File.Exists(oldFilePath))
+                    {
+                        return Results.NotFound(new
+                        {
+                            StatusCode = 404,
+                            Message = "File path not found on server"
+                        });
+                    }
 
-//                    if (!string.IsNullOrEmpty(fileUrl))
-//                    {
-//                        var oldFilePath = Path.Combine(wwwRootPath, fileUrl.TrimStart('/'));
-//                        if (File.Exists(oldFilePath))
-//                            File.Delete(oldFilePath);
-//                    }
+                    File.Delete(oldFilePath);
 
+                    var result = await service.deleteProductImageAsync(imageId);
 
+                    if (result==null)
+                    {
+                        return Results.NotFound(new
+                        {
+                            StatusCode = 404,
+                            Message = "Image record not found in database"
+                        });
+                    }
 
-//                    await service.deleteProductImageAsync(imageId);
-
-//                    return Results.Ok(new
-//                    {
-//                        StatusCode = 200,
-//                        Message = "Image deleted successfully"
-
-//                    });
-//                }
-//                catch (Exception ex)
-//                {
-//                    return Results.Problem($"Error: {ex.Message}");
-//                }
-//            })
-//.WithName("deleteProductimmage")
-//.WithTags("Products")
-//.Accepts<IFormFile>("multipart/form-data")
-//.DisableAntiforgery();
-
+                    return Results.Ok(new
+                    {
+                        StatusCode = 200,
+                        Message = "Image deleted successfully"
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(new
+                    {
+                        StatusCode = 500,
+                        Message = ex.Message
+                    }.ToString());
+                }
+            }).WithName("deleteProductimage")
+.WithTags("Prodcuts");
 
             product.MapGet("/GetAllProductdata", async (
     int userId,
