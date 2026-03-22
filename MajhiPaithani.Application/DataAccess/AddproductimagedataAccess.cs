@@ -69,6 +69,52 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
+        public async Task<string> UpdateProductImageAsync(int imageId, string newFilePath)
+        {
+            string message = "";
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("AddProductImageData", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@taskid", 2);
+                cmd.Parameters.AddWithValue("@imageId", imageId);
+                cmd.Parameters.AddWithValue("@sImageUrl", newFilePath);
+
+                await conn.OpenAsync();
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                    message = reader["Message"]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+            return message;
+        }
+
+        public async Task<string> deleteProductImageAsync(int imageId)
+        {
+            string message = "";
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("AddProductImageData", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@taskid", 3);
+                cmd.Parameters.AddWithValue("@imageId", imageId);
+                await conn.OpenAsync();
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                    message = reader["Message"]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+            return message;
+        }
+
         public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
         {
             var productDict = new Dictionary<int, ProductImageDto>();
@@ -113,7 +159,6 @@ namespace MajhiPaithani.Application.DataAccess
                             Images = new List<ProductImageItemDto>()
                         };
 
-                        // ✅ Get aggregated strings
                         var imageUrls = reader["sImageUrl"]?.ToString();
                         var imageIds = reader["ImageIds"]?.ToString();
                         var isPrimaryFlags = reader["IsPrimaryFlags"]?.ToString();
@@ -130,7 +175,7 @@ namespace MajhiPaithani.Application.DataAccess
                                 {
                                     iImageId = (idList != null && i < idList.Length) ? Convert.ToInt32(idList[i]) : 0,
                                     sImageUrl = baseUrl + urlList[i],
-                                    bIsPrimary = (primaryList != null && i < primaryList.Length)? Convert.ToInt32(primaryList[i]) == 1: (bool?)null
+                                    bIsPrimary = (primaryList != null && i < primaryList.Length) ? Convert.ToInt32(primaryList[i]) == 1 : (bool?)null
                                 });
                             }
                         }

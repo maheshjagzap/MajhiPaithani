@@ -103,6 +103,82 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
+        public async Task<string> UpdateProductInformation(UpdateProductDto dto)
+        {
+            string message = "";
+
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                var sql = @"UPDATE Products SET
+                    iCategoryId = @iCategoryId,
+                    sProductTitle = @sProductTitle,
+                    sDescription = @sDescription,
+                    dcBasePrice = @dcBasePrice,
+                    sColor = @sColor,
+                    sFabric = @sFabric,
+                    sDesignType = @sDesignType,
+                    bIsCustomizationAvailable = @bIsCustomizationAvailable,
+                    bIsActive = 1,
+                    bIsDeleted = 0,
+                    dUpdatedDate = GETDATE()
+                WHERE iProductId = @iProductId";
+
+                using var cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@iProductId", dto.iProductId);
+                cmd.Parameters.AddWithValue("@iCategoryId", (object)dto.iCategoryId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@sProductTitle", dto.sProductTitle);
+                cmd.Parameters.AddWithValue("@sDescription", dto.sDescription);
+                cmd.Parameters.AddWithValue("@dcBasePrice", (object)dto.dcBasePrice ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@sColor", (object)dto.sColor ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@sFabric", (object)dto.sFabric ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@sDesignType", (object)dto.sDesignType ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@bIsCustomizationAvailable", (object)dto.bIsCustomizationAvailable ?? DBNull.Value);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                message = "product information updated successfully";
+            }
+            catch (SqlException ex)
+            {
+                message = $"SQL Error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+
+            return message;
+        }
+
+        public async Task<string> DeleteProductInformation(int productId)
+        {
+            string message = "";
+
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("UPDATE Products SET bIsDeleted = 1 ,dDeletedDate=GETDATE() WHERE iProductId = @iProductId", conn);
+                cmd.Parameters.AddWithValue("@iProductId", productId);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                message = "product information deleted successfully";
+            }
+            catch (SqlException ex)
+            {
+                message = $"SQL Error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+
+            return message;
+        }
+
         public async Task<ProductAddresponce> AddPrductinformation(ProductDto dto, int? UserId, int? RoleId)
         {
             var response = new ProductAddresponce();
