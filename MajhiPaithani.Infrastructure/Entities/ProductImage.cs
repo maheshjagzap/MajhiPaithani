@@ -18,4 +18,7 @@ public partial class ProductImage
     public int sellerId { get; set; }
 
     public DateTime? DCreatedDate { get; set; }
+    public bool? isDeleted { get; set; }
+
+
 }
