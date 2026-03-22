@@ -33,5 +33,15 @@ namespace MajhiPaithani.Application.Services
         {
             return await _dataAccess.AddPrductinformation(dto, UserId, RoleId);
         }
+
+        public async Task<string> UpdateProductinfoasync(UpdateProductDto dto)
+        {
+            return await _dataAccess.UpdateProductInformation(dto);
+        }
+
+        public async Task<string> DeleteProductasync(int productId)
+        {
+            return await _dataAccess.DeleteProductInformation(productId);
+        }
     }
 }
