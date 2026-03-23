@@ -43,7 +43,7 @@ jobs:
           hostname
           whoami
 
-    # ✅ Stop IIS App Pool
+      # ✅ Stop IIS App Pool (SAFE - no error if already stopped)
     - name: 🛑 Stop IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -51,7 +51,7 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; Stop-WebAppPool -Name 'MajhiPaithani'"
+          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -eq 'Started') { Stop-WebAppPool -Name 'MajhiPaithani' }"
 
     # ✅ Upload files to IIS folder
     - name: 🚀 Upload Files to EC2
@@ -71,9 +71,9 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Get-ChildItem C:\inetpub\MajhiPaithaniApp"
+          powershell -Command "Get-ChildItem 'C:\inetpub\MajhiPaithaniApp'"
 
-    # ✅ Start IIS App Pool
+    # ✅ Start IIS App Pool (SAFE)
     - name: ▶️ Start IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -81,7 +81,7 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; Start-WebAppPool -Name 'MajhiPaithani'"
+          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -ne 'Started') { Start-WebAppPool -Name 'MajhiPaithani' }"
 
     # ✅ Final success
     - name: ✅ Deployment Completed
