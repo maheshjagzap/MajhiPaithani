@@ -7,8 +7,7 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest   # ✅ FIXED (Linux runner)
-
+    runs-on: ubuntu-latest   
     steps:
     - name: 📥 Checkout Code
       uses: actions/checkout@v3
