@@ -13,7 +13,6 @@ namespace MajhiPaithani.API.Endpoint
         {
             var product = app.MapGroup("/api/Product");
 
-
             product.MapPost("api/uploadimage", async (
     [FromForm] int? ProdcutId,
     [FromForm] int? userId,
