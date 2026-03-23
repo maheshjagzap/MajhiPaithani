@@ -15,7 +15,7 @@ namespace MajhiPaithani.API.Endpoint
 
 
             product.MapPost("api/uploadimage", async (
-    [FromForm] int? ProdcutId,
+    [FromQuery] int? ProdcutId,
     [FromForm] int? userId,
     [FromForm] IFormFileCollection Files,
     AddProductImageservice service,
@@ -70,7 +70,7 @@ namespace MajhiPaithani.API.Endpoint
 
 
             product.MapPut("/updateproductimage", async (
-    int imageId,
+    [FromQuery] int imageId,
    [FromQuery] string? fileUrl,
     IFormFile newFile,
     AddProductImageservice service) =>
