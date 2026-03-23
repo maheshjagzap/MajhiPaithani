@@ -23,8 +23,11 @@ jobs:
     - name: 🏗️ Build
       run: dotnet build --configuration Release
 
-    - name: 📦 Publish
-      run: dotnet publish -c Release -o publish
+    - name: 🧹 Clean Publish Folder
+      run: rm -rf publish
+
+    - name: 📦 Publish API Only
+      run: dotnet publish ./MajhiPaithani.API/MajhiPaithani.API.csproj -c Release -o publish
 
     - name: 📂 Show Publish Folder (DEBUG)
       run: |
