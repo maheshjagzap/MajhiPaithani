@@ -1,4 +1,4 @@
-﻿using MajhiPaithani.API.Endpoint;
+using MajhiPaithani.API.Endpoint;
 using MajhiPaithani.API.Hubs;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
