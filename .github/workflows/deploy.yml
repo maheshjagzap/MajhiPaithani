@@ -61,8 +61,7 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "publish/*"
-        target: "/c$/inetpub/MajhiPaithaniApp"
-
+        target: "C:/inetpub/MajhiPaithaniApp"
     # ✅ Verify deployment
     - name: 🔍 Verify Deployment
       uses: appleboy/ssh-action@v1.0.0
