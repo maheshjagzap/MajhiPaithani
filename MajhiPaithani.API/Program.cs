@@ -1,4 +1,5 @@
 ﻿using MajhiPaithani.API.Endpoint;
+using MajhiPaithani.API.Hubs;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Interfaces.IAuthService;
@@ -67,6 +68,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
+        // SignalR sends token via query string, not Authorization header
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                    context.Token = accessToken;
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddSwaggerGen(c =>
 {
@@ -78,13 +91,28 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-// CORS
+// SignalR — enable detailed errors so hub exceptions are visible on client
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
+// CORS — SignalR requires AllowCredentials, so we can't use AllowAnyOrigin
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                "https://localhost:7006",  // API itself / chat.html opened via file
+                "http://localhost:7006",
+                "http://localhost:3000",   // React / Next.js dev
+                "http://localhost:5173",   // Vite dev
+                "http://localhost:4200",   // Angular dev
+                "http://127.0.0.1:5500",   // VS Code Live Server
+                "null"                     // file:// opened HTML pages
+              )
               .AllowAnyMethod()
-              .AllowAnyHeader());
+              .AllowAnyHeader()
+              .AllowCredentials());
 });
 
 
@@ -120,6 +148,7 @@ app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
 
 // 4th: Routing
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 //MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 Dropdown.Map(app);

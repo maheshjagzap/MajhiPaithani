@@ -167,10 +167,19 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("dSentDate");
             entity.Property(e => e.IChatRoomId).HasColumnName("iChatRoomId");
             entity.Property(e => e.ISenderUserId).HasColumnName("iSenderUserId");
+            entity.Property(e => e.IReceiverUserId).HasColumnName("iReceiverUserId");
             entity.Property(e => e.SAttachmentUrl)
                 .HasMaxLength(500)
                 .HasColumnName("sAttachmentUrl");
             entity.Property(e => e.SMessage).HasColumnName("sMessage");
+            entity.Property(e => e.BIsDelivered)
+                .HasDefaultValue(false)
+                .HasColumnName("bIsDelivered");
+            entity.Property(e => e.BIsRead)
+                .HasDefaultValue(false)
+                .HasColumnName("bIsRead");
+            entity.Property(e => e.DDeliveredDate).HasColumnName("dDeliveredDate");
+            entity.Property(e => e.DReadDate).HasColumnName("dReadDate");
         });
 
         modelBuilder.Entity<ChatRoom>(entity =>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>MajhiPaithani - Real Time Chat Test</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+
+        html, body {
+            height: 100%;
+            background: #f0f2f5;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h2 { text-align: center; color: #6c3483; margin-bottom: 4px; font-size: 20px; flex-shrink: 0; }
+        .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 12px; flex-shrink: 0; }
+
+        /* Step 1 setup bar at top */
+        .setup-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;   /* don't shrink when panels grow */
+        }
+        .setup-bar label { font-size: 13px; color: #555; font-weight: bold; white-space: nowrap; }
+        .setup-bar input {
+            padding: 8px 12px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 13px; width: 220px;
+        }
+        .setup-bar button {
+            padding: 9px 20px; background: #6c3483; color: white;
+            border: none; border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap;
+        }
+        .setup-bar button:hover { background: #5b2c6f; }
+        #setupStatus { font-size: 13px; font-weight: bold; }
+        #setupStatus.ok { color: #27ae60; }
+        #setupStatus.err { color: #e74c3c; }
+
+        /* Two chat panels side by side */
+        .panels {
+            display: flex;
+            gap: 16px;
+            flex: 1;          /* fill remaining vertical space */
+            min-height: 0;    /* critical — allows flex children to shrink below content size */
+        }
+
+        .panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;    /* critical — allows inner flex children to scroll */
+        }
+
+        .panel-header {
+            padding: 14px 18px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-header.user1 { background: #6c3483; }
+        .panel-header.user4 { background: #1a5276; }
+
+        .panel-status {
+            font-size: 11px;
+            font-weight: normal;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+        }
+        .panel-status.connected { background: #27ae60; }
+        .panel-status.error { background: #e74c3c; }
+
+        .messages {
+            flex: 1;
+            min-height: 0;     /* critical — without this, overflow-y: auto won't scroll */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #fafafa;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar styling */
+        .messages::-webkit-scrollbar { width: 5px; }
+        .messages::-webkit-scrollbar-track { background: transparent; }
+        .messages::-webkit-scrollbar-thumb { background: #d0b0e0; border-radius: 10px; }
+        .panel.user4-panel .messages::-webkit-scrollbar-thumb { background: #a9cce3; }
+
+        .message {
+            max-width: 78%;
+            padding: 9px 13px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .message.mine   { align-self: flex-end;   background: #6c3483; color: white; border-bottom-right-radius: 3px; }
+        .message.theirs { align-self: flex-start;  background: #e8e8e8; color: #333;  border-bottom-left-radius: 3px; }
+        .panel.user4-panel .message.mine { background: #1a5276; }
+
+        .message .meta { font-size: 10px; margin-top: 3px; opacity: 0.7; }
+        .tick { margin-left: 4px; font-size: 11px; }
+        .tick.sent     { color: rgba(255,255,255,0.6); }
+        .tick.delivered{ color: rgba(255,255,255,0.9); }
+        .tick.read     { color: #a8d8ff; }
+
+        .empty-msg { color: #bbb; font-size: 13px; text-align: center; margin: auto; }
+
+        .input-area {
+            display: flex;
+            padding: 10px 12px;
+            border-top: 1px solid #eee;
+            gap: 8px;
+        }
+        .input-area input {
+            flex: 1; padding: 9px 13px;
+            border: 1px solid #ddd; border-radius: 20px;
+            font-size: 13px; outline: none;
+        }
+        .input-area input:focus { border-color: #6c3483; }
+        .panel.user4-panel .input-area input:focus { border-color: #1a5276; }
+        .input-area button {
+            padding: 9px 16px; color: white;
+            border: none; border-radius: 20px; cursor: pointer; font-size: 13px;
+        }
+        .input-area button.btn-user1 { background: #6c3483; }
+        .input-area button.btn-user4 { background: #1a5276; }
+        .input-area button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<h2>💬 MajhiPaithani Real-Time Chat Test</h2>
+<p class="subtitle">Both panels connect to the same chat room — type in one and see it appear in the other instantly</p>
+
+<!-- STEP 1: Setup -->
+<div class="setup-bar">
+    <label>API URL:</label>
+    <input id="apiUrl" type="text" value="https://localhost:7006" />
+
+    <label>Customer ID (User 1):</label>
+    <input id="customerId" type="number" value="1" style="width:100px" />
+
+    <label>Seller ID (User 4):</label>
+    <input id="sellerId" type="number" value="4" style="width:100px" />
+
+    <button onclick="initChat()">🚀 Start Chat</button>
+    <span id="setupStatus">Not started</span>
+</div>
+
+<!-- STEP 2: Two chat panels -->
+<div class="panels">
+
+    <!-- User 1 Panel (Customer) -->
+    <div class="panel">
+        <div class="panel-header user1">
+            👤 User 1 — Customer
+            <span class="panel-status" id="status1">Disconnected</span>
+        </div>
+        <div class="messages" id="messages1">
+            <span class="empty-msg">Click "Start Chat" to connect</span>
+        </div>
+        <div class="input-area">
+            <input id="input1" type="text" placeholder="User 1 types here..."
+                   onkeydown="if(event.key==='Enter') send(1)"
+                   onfocus="markRead(1)" />
+            <button class="btn-user1" id="btn1" onclick="send(1)">Send</button>
+        </div>
+    </div>
+
+    <!-- User 4 Panel (Seller) -->
+    <div class="panel user4-panel">
+        <div class="panel-header user4">
+            👤 User 4 — Seller
+            <span class="panel-status" id="status4">Disconnected</span>
+        </div>
+        <div class="messages" id="messages4">
+            <span class="empty-msg">Click "Start Chat" to connect</span>
+        </div>
+        <div class="input-area">
+            <input id="input4" type="text" placeholder="User 4 types here..."
+                   onkeydown="if(event.key==='Enter') send(4)"
+                   onfocus="markRead(4)" />
+            <button class="btn-user4" id="btn4" onclick="send(4)">Send</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>
+    let conn1 = null;   // SignalR connection for User 1
+    let conn4 = null;   // SignalR connection for User 4
+    let chatRoomId = null;
+    let user1Id = 1;
+    let user4Id = 4;
+
+    async function initChat() {
+        const apiUrl = document.getElementById('apiUrl').value.trim();
+        user1Id = parseInt(document.getElementById('customerId').value);
+        user4Id = parseInt(document.getElementById('sellerId').value);
+
+        setSetupStatus('Loading chat history...', '');
+
+        try {
+            const res = await fetch(`${apiUrl}/api/chat/history?senderId=${user1Id}&receiverId=${user4Id}`);
+            if (res.ok) {
+                const data = await res.json();
+                chatRoomId = data.roomId;
+                clearMessages(1);
+                clearMessages(4);
+                data.messages.forEach(msg => {
+                    appendMessage(1, msg);
+                    appendMessage(4, msg);
+                });
+                // Mark delivered for both users on history load
+                if (chatRoomId) {
+                    await Promise.all([
+                        fetch(`${apiUrl}/api/chat/mark-delivered`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ roomId: chatRoomId, userId: user1Id }) }),
+                        fetch(`${apiUrl}/api/chat/mark-delivered`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ roomId: chatRoomId, userId: user4Id }) })
+                    ]);
+                }
+            }
+        } catch { /* non-critical */ }
+
+        // Connect both users to SignalR hub
+        await connectUser(apiUrl, 1, user1Id);
+        await connectUser(apiUrl, 4, user4Id);
+
+        setSetupStatus(`✅ Both users connected — start chatting!`, 'ok');
+    }
+
+    async function connectUser(apiUrl, panelNum, userId) {
+        const conn = new signalR.HubConnectionBuilder()
+            .withUrl(`${apiUrl}/hubs/chat`)   // no token needed for now
+            .withAutomaticReconnect()
+            .build();
+
+        // When this user receives a message — show it in their panel
+        conn.on('ReceiveMessage', (msg) => {
+            appendMessage(panelNum, msg);
+            // Auto mark-delivered when receiver gets the message
+            if (chatRoomId) {
+                const receiverId = panelNum === 1 ? user1Id : user4Id;
+                const apiUrl = document.getElementById('apiUrl').value.trim();
+                fetch(`${apiUrl}/api/chat/mark-delivered`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: chatRoomId, userId: receiverId })
+                });
+            }
+        });
+
+        conn.on('MessagesDelivered', (ids) => updateTicks(ids, 'delivered', '✓✓'));
+        conn.on('MessagesRead',      (ids) => updateTicks(ids, 'read', '✓✓'));
+
+        conn.onreconnecting(() => setStatus(panelNum, 'Reconnecting...', ''));
+        conn.onreconnected(async () => {
+            setStatus(panelNum, 'Connected ✓', 'connected');
+            await conn.invoke('JoinRoom', chatRoomId);
+        });
+        conn.onclose(() => setStatus(panelNum, 'Disconnected', 'error'));
+
+        // Always enable input/button regardless — show error in status if conn fails
+        document.getElementById(`input${panelNum}`).disabled = false;
+        document.getElementById(`btn${panelNum}`).disabled = false;
+
+        if (panelNum === 1) conn1 = conn;
+        else conn4 = conn;
+
+        try {
+            await conn.start();
+
+            // Join the room only if we already know the roomId from history
+            // If first-time chat, JoinRoom is called after first message is sent
+            if (chatRoomId) await conn.invoke('JoinRoom', chatRoomId);
+
+            setStatus(panelNum, 'Connected ✓', 'connected');
+        } catch (err) {
+            setStatus(panelNum, 'Failed: ' + err.message, 'error');
+            console.error(`User ${userId} connection failed:`, err);
+        }
+    }
+
+    async function send(panelNum) {
+        const input      = document.getElementById(`input${panelNum}`);
+        const text       = input.value.trim();
+        if (!text) { input.focus(); return; }
+
+        const apiUrl     = document.getElementById('apiUrl').value.trim();
+        const senderId   = panelNum === 1 ? user1Id : user4Id;
+        const receiverId = panelNum === 1 ? user4Id : user1Id;
+        const btn        = document.getElementById(`btn${panelNum}`);
+        btn.disabled     = true;
+
+        try {
+            // ── POST /api/chat/send ──────────────────────────────────────────
+            // Handles everything: creates room if needed, saves message, broadcasts via SignalR
+            const res = await fetch(`${apiUrl}/api/chat/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ senderId, receiverId, message: text })
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                setStatus(panelNum, 'Send failed: ' + res.status, 'error');
+                console.error('Send error:', err);
+            } else {
+                const data = await res.json();
+
+                // If first message — room was just created, join both connections to it
+                // then reload history so the first message appears in both panels
+                if (!chatRoomId) {
+                    chatRoomId = data.roomId;
+                    if (conn1) await conn1.invoke('JoinRoom', chatRoomId);
+                    if (conn4) await conn4.invoke('JoinRoom', chatRoomId);
+
+                    // Load history so first message shows up (SignalR wasn't joined yet when it was sent)
+                    const apiUrl = document.getElementById('apiUrl').value.trim();
+                    const histRes = await fetch(`${apiUrl}/api/chat/history?senderId=${user1Id}&receiverId=${user4Id}`);
+                    if (histRes.ok) {
+                        const histData = await histRes.json();
+                        clearMessages(1);
+                        clearMessages(4);
+                        histData.messages.forEach(msg => {
+                            appendMessage(1, msg);
+                            appendMessage(4, msg);
+                        });
+                    }
+                }
+
+                input.value = '';
+                input.focus();
+                setStatus(panelNum, 'Connected ✓', 'connected');
+            }
+        } catch (err) {
+            setStatus(panelNum, 'Send failed: ' + err.message, 'error');
+            console.error('Send failed:', err);
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function appendMessage(panelNum, msg) {
+        const container = document.getElementById(`messages${panelNum}`);
+        const myId = panelNum === 1 ? user1Id : user4Id;
+
+        // Remove the "Click Start Chat" placeholder if present
+        const empty = container.querySelector('.empty-msg');
+        if (empty) empty.remove();
+
+        const isMine = msg.iSenderUserId === myId || msg.ISenderUserId === myId;
+        const time   = new Date(msg.dSentDate || msg.DSentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const label  = isMine ? 'You' : `User ${msg.iSenderUserId || msg.ISenderUserId}`;
+        const msgId  = msg.iMessageId || msg.IMessageId;
+
+        const tickHtml = isMine ? `<span class="tick ${tickClass(msg)}" data-msgid="${msgId}">${tickIcon(msg)}</span>` : '';
+
+        const div = document.createElement('div');
+        div.className = `message ${isMine ? 'mine' : 'theirs'}`;
+        div.dataset.msgid = msgId;
+        div.innerHTML = `
+            <div>${escapeHtml(msg.sMessage || msg.SMessage)}</div>
+            <div class="meta">${label} · ${time}${tickHtml}</div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function clearMessages(panelNum) {
+        document.getElementById(`messages${panelNum}`).innerHTML = '';
+    }
+
+    function setStatus(panelNum, text, cls) {
+        const el = document.getElementById(`status${panelNum}`);
+        el.textContent = text;
+        el.className = `panel-status ${cls}`;
+    }
+
+    function setSetupStatus(text, cls) {
+        const el = document.getElementById('setupStatus');
+        el.textContent = text;
+        el.className = cls;
+    }
+
+    function markRead(panelNum) {
+        if (!chatRoomId) return;
+        const apiUrl = document.getElementById('apiUrl').value.trim();
+        const userId = panelNum === 1 ? user1Id : user4Id;
+        fetch(`${apiUrl}/api/chat/mark-read`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roomId: chatRoomId, userId })
+        });
+    }
+
+    function tickClass(msg) {
+        if (msg.bIsRead || msg.BIsRead) return 'read';
+        if (msg.bIsDelivered || msg.BIsDelivered) return 'delivered';
+        return 'sent';
+    }
+
+    function tickIcon(msg) {
+        if (msg.bIsRead || msg.BIsRead) return '✓✓';
+        if (msg.bIsDelivered || msg.BIsDelivered) return '✓✓';
+        return '✓';
+    }
+
+    function updateTicks(ids, cssClass, icon) {
+        ids.forEach(id => {
+            document.querySelectorAll(`.tick[data-msgid="${id}"]`).forEach(el => {
+                el.className = `tick ${cssClass}`;
+                el.textContent = icon;
+            });
+        });
+    }
+
+    function escapeHtml(str) {
+        return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+</script>
+</body>
+</html>

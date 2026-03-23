@@ -22,13 +22,14 @@ public class JwtTokenService : IJwtTokenService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
-{
-                new Claim("userId", userId.ToString()),
-                new Claim("email", email),
-                new Claim("role", role),
-                new Claim("name", fullName),
-                new Claim("phone", phoneNumber)
-            };
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // required for SignalR UserIdentifier
+            new Claim("userId", userId.ToString()),
+            new Claim("email", email),
+            new Claim("role", role),
+            new Claim("name", fullName),
+            new Claim("phone", phoneNumber)
+        };
 
         var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
