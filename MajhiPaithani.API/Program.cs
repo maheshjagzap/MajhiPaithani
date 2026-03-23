@@ -97,19 +97,29 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
 });
 
-// --- Update this section ---
+// Two CORS policies:
+// "AllowAll"     — used by all REST API endpoints (allows any origin)
+// "SignalRPolicy" — used only by SignalR hub (requires specific origins + credentials)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+
+    options.AddPolicy("SignalRPolicy", policy =>
         policy.WithOrigins(
                 "https://localhost:7006",
+                "http://localhost:7006",
+                "http://localhost:3000",
                 "http://localhost:5173",
+                "http://localhost:4200",
                 "http://127.0.0.1:5500",
-                "https://mazipaithaniadmin.onrender.com" // 👈 ADD YOUR HOSTED UI URL HERE
+                "https://mazipaithaniadmin.onrender.com"
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials()); // Required for SignalR
+              .AllowCredentials());
 });
 
 var app = builder.Build();
@@ -144,7 +154,7 @@ app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
 
 // 4th: Routing
 app.MapControllers();
-app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<ChatHub>("/hubs/chat").RequireCors("SignalRPolicy");
 
 //MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 Dropdown.Map(app);
