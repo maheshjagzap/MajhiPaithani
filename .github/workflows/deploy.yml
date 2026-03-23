@@ -70,7 +70,7 @@ jobs:
         host: 15.207.106.250
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "publish/*"
+        source: "publish/"
         target: "C:/inetpub/MajhiPaithaniApp"
     # ✅ Verify deployment
     - name: 🔍 Verify Deployment
