@@ -1,1 +1,93 @@
 
+name: Deploy to EC2 IIS (Debug Mode)
+
+on:
+  push:
+    branches:
+      - Master
+
+jobs:
+  build-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'   # change if needed
+
+    - name: 🔄 Restore
+      run: dotnet restore
+
+    - name: 🏗️ Build
+      run: dotnet build --configuration Release
+
+    - name: 📦 Publish
+      run: dotnet publish -c Release -o publish
+
+    - name: 📂 Show Publish Folder (DEBUG)
+      run: |
+        echo "Listing publish folder"
+        dir publish
+
+    # ✅ Test SSH connection first
+    - name: 🔐 Test SSH Connection
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 15.207.106.250
+        username: Administrator
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          echo "Connected to EC2 successfully"
+          hostname
+          whoami
+
+    # ✅ Stop App Pool (before deploy)
+    - name: 🛑 Stop IIS App Pool
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 15.207.106.250
+        username: Administrator
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          Import-Module WebAdministration
+          Stop-WebAppPool -Name "MajhiPaithaniAppPool"
+
+    # ✅ Upload files
+    - name: 🚀 Upload Files to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: 15.207.106.250
+        username: Administrator
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "publish/*"
+        target: "C:/inetpub/MajhiPaithaniApp"
+
+    # ✅ Verify files on server (DEBUG)
+    - name: 🔍 Verify Deployment
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 15.207.106.250
+        username: Administrator
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          echo "Checking deployed files..."
+          dir C:\inetpub\MajhiPaithaniApp
+
+    # ✅ Start App Pool again
+    - name: ▶️ Start IIS App Pool
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 15.207.106.250
+        username: Administrator
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          Import-Module WebAdministration
+          Start-WebAppPool -Name "MajhiPaithaniAppPool"
+
+    # ✅ Final success message
+    - name: ✅ Deployment Completed
+      run: echo "Deployment Successful 🚀"
