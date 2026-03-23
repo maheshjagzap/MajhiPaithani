@@ -51,7 +51,7 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; Stop-WebAppPool -Name 'MajhiPaithaniAppPool'"
+          powershell -Command "Import-Module WebAdministration; Stop-WebAppPool -Name 'MajhiPaithani'"
 
     # ✅ Upload files to IIS folder
     - name: 🚀 Upload Files to EC2
@@ -81,7 +81,7 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; Start-WebAppPool -Name 'MajhiPaithaniAppPool'"
+          powershell -Command "Import-Module WebAdministration; Start-WebAppPool -Name 'MajhiPaithani'"
 
     # ✅ Final success
     - name: ✅ Deployment Completed
