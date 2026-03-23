@@ -1,4 +1,4 @@
-name: Deploy to EC2 IIS (Final)
+name: Deploy to EC2 IIS (Debug Mode)
 
 on:
   push:
@@ -7,40 +7,44 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest   
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore
+    - name: 🔄 Restore
       run: dotnet restore
 
-    - name: Build
+    - name: 🏗️ Build
       run: dotnet build --configuration Release
 
-    - name: Publish
+    - name: 📦 Publish
       run: dotnet publish -c Release -o publish
 
-    - name: Debug Publish
-      run: ls -la publish
+    - name: 📂 Show Publish Folder (DEBUG)
+      run: |
+        echo "Listing publish folder"
+        ls -la publish
 
-    - name: Test SSH
+    # ✅ Test SSH connection
+    - name: 🔐 Test SSH Connection
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: 15.207.106.250
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          echo "Connected"
+          echo "Connected to EC2 successfully"
           hostname
+          whoami
 
-    - name: Stop App Pool
+    # ✅ Stop IIS App Pool
+    - name: 🛑 Stop IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: 15.207.106.250
@@ -49,16 +53,8 @@ jobs:
         script: |
           powershell -Command "Import-Module WebAdministration; Stop-WebAppPool -Name 'MajhiPaithani'"
 
-    - name: Clean IIS Folder
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: 15.207.106.250
-        username: Administrator
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          powershell -Command "Remove-Item -Path 'C:\inetpub\MajhiPaithaniApp\*' -Recurse -Force -ErrorAction SilentlyContinue"
-
-    - name: Upload Files
+    # ✅ Upload files to IIS folder
+    - name: 🚀 Upload Files to EC2
       uses: appleboy/scp-action@v0.1.7
       with:
         host: 15.207.106.250
@@ -67,16 +63,18 @@ jobs:
         source: "publish/*"
         target: "/c$/inetpub/MajhiPaithaniApp"
 
-    - name: Verify Deployment
+    # ✅ Verify deployment
+    - name: 🔍 Verify Deployment
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: 15.207.106.250
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Get-ChildItem 'C:\inetpub\MajhiPaithaniApp'"
+          powershell -Command "Get-ChildItem C:\inetpub\MajhiPaithaniApp"
 
-    - name: Start App Pool
+    # ✅ Start IIS App Pool
+    - name: ▶️ Start IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: 15.207.106.250
@@ -85,5 +83,6 @@ jobs:
         script: |
           powershell -Command "Import-Module WebAdministration; Start-WebAppPool -Name 'MajhiPaithani'"
 
-    - name: Done
+    # ✅ Final success
+    - name: ✅ Deployment Completed
       run: echo "Deployment Successful 🚀"
