@@ -125,50 +125,50 @@ public class ChatController : ControllerBase
         return Ok(new { roomId = room.IChatRoomId, messages });
     }
 
-    [HttpPost("mark-delivered")]
-    public async Task<IActionResult> MarkDelivered([FromBody] MarkStatusRequest request)
-    {
-        var messages = await _db.ChatMessages
-            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsDelivered)
-            .ToListAsync();
+    //    [HttpPost("mark-delivered")]
+    //    public async Task<IActionResult> MarkDelivered([FromBody] MarkStatusRequest request)
+    //    {
+    //        var messages = await _db.ChatMessages
+    //            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsDelivered)
+    //            .ToListAsync();
 
-        if (!messages.Any()) return Ok();
+    //        if (!messages.Any()) return Ok();
 
-        foreach (var m in messages)
-        {
-            m.BIsDelivered = true;
-            m.DDeliveredDate = DateTime.UtcNow;
-        }
-        await _db.SaveChangesAsync();
+    //        foreach (var m in messages)
+    //        {
+    //            m.BIsDelivered = true;
+    //            m.DDeliveredDate = DateTime.UtcNow;
+    //        }
+    //        await _db.SaveChangesAsync();
 
-        var ids = messages.Select(m => m.IMessageId).ToList();
-        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesDelivered", ids);
-        return Ok();
-    }
+    //        var ids = messages.Select(m => m.IMessageId).ToList();
+    //        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesDelivered", ids);
+    //        return Ok();
+    //    }
 
-    [HttpPost("mark-read")]
-    public async Task<IActionResult> MarkRead([FromBody] MarkStatusRequest request)
-    {
-        var messages = await _db.ChatMessages
-            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsRead)
-            .ToListAsync();
+    //    [HttpPost("mark-read")]
+    //    public async Task<IActionResult> MarkRead([FromBody] MarkStatusRequest request)
+    //    {
+    //        var messages = await _db.ChatMessages
+    //            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsRead)
+    //            .ToListAsync();
 
-        if (!messages.Any()) return Ok();
+    //        if (!messages.Any()) return Ok();
 
-        foreach (var m in messages)
-        {
-            m.BIsRead = true;
-            m.BIsDelivered = true;
-            m.DReadDate = DateTime.UtcNow;
-            m.DDeliveredDate ??= DateTime.UtcNow;
-        }
-        await _db.SaveChangesAsync();
+    //        foreach (var m in messages)
+    //        {
+    //            m.BIsRead = true;
+    //            m.BIsDelivered = true;
+    //            m.DReadDate = DateTime.UtcNow;
+    //            m.DDeliveredDate ??= DateTime.UtcNow;
+    //        }
+    //        await _db.SaveChangesAsync();
 
-        var ids = messages.Select(m => m.IMessageId).ToList();
-        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesRead", ids);
-        return Ok();
-    }
+    //        var ids = messages.Select(m => m.IMessageId).ToList();
+    //        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesRead", ids);
+    //        return Ok();
+    //    }
+    //}
 }
-
 public record SendMessageRequest(int SenderId, int ReceiverId, string Message);
 public record MarkStatusRequest(int RoomId, int UserId);
