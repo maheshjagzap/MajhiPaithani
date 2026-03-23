@@ -97,24 +97,20 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
 });
 
-// CORS — SignalR requires AllowCredentials, so we can't use AllowAnyOrigin
+// --- Update this section ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
         policy.WithOrigins(
-                "https://localhost:7006",  // API itself / chat.html opened via file
-                "http://localhost:7006",
-                "http://localhost:3000",   // React / Next.js dev
-                "http://localhost:5173",   // Vite dev
-                "http://localhost:4200",   // Angular dev
-                "http://127.0.0.1:5500",   // VS Code Live Server
-                "null"                     // file:// opened HTML pages
+                "https://localhost:7006",
+                "http://localhost:5173",
+                "http://127.0.0.1:5500",
+                "https://mazipaithaniadmin.onrender.com" // 👈 ADD YOUR HOSTED UI URL HERE
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials());
+              .AllowCredentials()); // Required for SignalR
 });
-
 
 var app = builder.Build();
 
