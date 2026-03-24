@@ -1,4 +1,5 @@
-﻿using MajhiPaithani.API.Endpoint;
+using MajhiPaithani.API.Endpoint;
+using MajhiPaithani.API.Hubs;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Interfaces.IAuthService;
@@ -67,6 +68,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
+        // SignalR sends token via query string, not Authorization header
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                    context.Token = accessToken;
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddSwaggerGen(c =>
 {
@@ -78,15 +91,36 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-// CORS
+// SignalR — enable detailed errors so hub exceptions are visible on client
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
+// Two CORS policies:
+// "AllowAll"     — used by all REST API endpoints (allows any origin)
+// "SignalRPolicy" — used only by SignalR hub (requires specific origins + credentials)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader());
-});
 
+    options.AddPolicy("SignalRPolicy", policy =>
+        policy.WithOrigins(
+                "https://localhost:7006",
+                "http://localhost:7006",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:4200",
+                "http://127.0.0.1:5500",
+                "https://mazipaithaniadmin.onrender.com"
+              )
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+});
 
 var app = builder.Build();
 
@@ -120,6 +154,7 @@ app.UseStaticFiles(); // ✅ This enables serving files from wwwroot
 
 // 4th: Routing
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat").RequireCors("SignalRPolicy");
 
 //MajhiPaithani.API.Endpoints.DummyEndpoint.Map(app);
 Dropdown.Map(app);
