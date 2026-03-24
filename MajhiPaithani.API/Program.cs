@@ -170,6 +170,6 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // When running on the server/Docker
-    app.Run("http://0.0.0.0:8080");
+    // When running on the server/Docker "http://0.0.0.0:8080"
+    app.Run();
 }
