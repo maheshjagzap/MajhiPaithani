@@ -171,5 +171,5 @@ if (app.Environment.IsDevelopment())
 else
 {
     // When running on the server/Docker
-    app.Run("");
+    app.Run();
 }
