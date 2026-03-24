@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace MajhiPaithani.Application.Models.Request
 {
+    public class GetAllProductsResponseDto
+    {
+        public List<ProductImageDto> Products { get; set; }
+        public InventorySummaryDto InventorySummary { get; set; }
+    }
+
+    public class InventorySummaryDto
+    {
+        public int AvailableStock { get; set; }
+        public decimal InventoryValue { get; set; }
+        public int ProductCount { get; set; }
+    }
+
     public class ProductImageDto
     {
         public int iProductId { get; set; }
@@ -22,8 +35,6 @@ namespace MajhiPaithani.Application.Models.Request
         public bool bIsDeleted { get; set; }
         public DateTime ProductCreatedDate { get; set; }
         public DateTime? ProductUpdatedDate { get; set; }
-
-        // ✅ Nested list of images
         public List<ProductImageItemDto> Images { get; set; }
     }
 

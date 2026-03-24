@@ -191,7 +191,8 @@ namespace MajhiPaithani.API.Endpoint
                     {
                         StatusCode = 200,
                         Message = "Product data fetched successfully",
-                        Data = data
+                        Products = data.Products,
+                        InventorySummary = data.InventorySummary
                     });
                 }
                 catch (Exception ex)

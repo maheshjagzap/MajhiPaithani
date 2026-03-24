@@ -33,7 +33,7 @@ namespace MajhiPaithani.Application.Services
             return await _dataAccess.deleteProductImageAsync(imageId);
         }
 
-        public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
+        public async Task<GetAllProductsResponseDto> GetProductImagesAsync(int userId)
         {
             return await _dataAccess.GetProductImagesAsync(userId);
         }
