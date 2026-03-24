@@ -115,20 +115,46 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
-        public async Task<List<ProductImageDto>> GetProductImagesAsync(int userId)
+        public async Task<GetAllProductsResponseDto> GetProductImagesAsync(int userId)
         {
             var productDict = new Dictionary<int, ProductImageDto>();
             var baseUrl = GetBaseUrl();
+            var summary = new InventorySummaryDto();
 
-            using (var conn = new SqlConnection(_connectionString))
+            using var conn = new SqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            // Step 1: Get sellerId from Sellers table by userId
+            int sellerId = 0;
+            using (var sellerCmd = new SqlCommand(
+                "SELECT TOP 1 iSellerId FROM Sellers WHERE iUserId = @UserId AND bIsDeleted = 0", conn))
+            {
+                sellerCmd.Parameters.AddWithValue("@UserId", userId);
+                var result = await sellerCmd.ExecuteScalarAsync();
+                if (result != null && result != DBNull.Value)
+                    sellerId = Convert.ToInt32(result);
+            }
+
+            // Step 2: Get inventory summary using sellerId
+            using (var summaryCmd = new SqlCommand(
+                "SELECT SUM(ISNULL(iStock, 0)) AS AvailableStock, SUM(ISNULL(dcBasePrice, 0)) AS InventoryValue, COUNT(*) AS ProductCount FROM Products WHERE bIsDeleted = 0 AND iSellerId = @SellerId", conn))
+            {
+                summaryCmd.Parameters.AddWithValue("@SellerId", sellerId);
+                using var summaryReader = await summaryCmd.ExecuteReaderAsync();
+                if (await summaryReader.ReadAsync())
+                {
+                    summary.AvailableStock = summaryReader["AvailableStock"] == DBNull.Value ? 0 : Convert.ToInt32(summaryReader["AvailableStock"]);
+                    summary.InventoryValue = summaryReader["InventoryValue"] == DBNull.Value ? 0 : Convert.ToDecimal(summaryReader["InventoryValue"]);
+                    summary.ProductCount = summaryReader["ProductCount"] == DBNull.Value ? 0 : Convert.ToInt32(summaryReader["ProductCount"]);
+                }
+            }
+
+            // Step 3: Get product + images via SP
             using (var cmd = new SqlCommand("AddProductImageData", conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-
                 cmd.Parameters.AddWithValue("@taskid", 0);
                 cmd.Parameters.AddWithValue("@UserId", userId);
-
-                await conn.OpenAsync();
 
                 using var reader = await cmd.ExecuteReaderAsync();
 
@@ -185,7 +211,11 @@ namespace MajhiPaithani.Application.DataAccess
                 }
             }
 
-            return productDict.Values.ToList();
+            return new GetAllProductsResponseDto
+            {
+                Products = productDict.Values.ToList(),
+                InventorySummary = summary
+            };
         }
 
 

@@ -121,7 +121,8 @@ namespace MajhiPaithani.Application.DataAccess
                     bIsCustomizationAvailable = @bIsCustomizationAvailable,
                     bIsActive = 1,
                     bIsDeleted = 0,
-                    dUpdatedDate = GETDATE()
+                    dUpdatedDate = GETDATE(),
+                    istock = @istock                       
                 WHERE iProductId = @iProductId";
 
                 using var cmd = new SqlCommand(sql, conn);
@@ -134,6 +135,7 @@ namespace MajhiPaithani.Application.DataAccess
                 cmd.Parameters.AddWithValue("@sFabric", (object)dto.sFabric ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@sDesignType", (object)dto.sDesignType ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@bIsCustomizationAvailable", (object)dto.bIsCustomizationAvailable ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@istock", (object)dto.iStock ?? DBNull.Value);
 
                 await conn.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
