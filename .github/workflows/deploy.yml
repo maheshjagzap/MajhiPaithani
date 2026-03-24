@@ -27,7 +27,7 @@ jobs:
       run: rm -rf publish
 
     - name: 📦 Publish API Only
-      run: dotnet publish ./MajhiPaithani.API/MajhiPaithani.API.csproj -c Release -o publish
+      run: dotnet publish ./MajhiPaithani.API/MajhiPaithani.API.csproj -c Release -r win-x64 --self-contained true -o publish
 
     - name: 📂 Show Publish Folder (DEBUG)
       run: |
