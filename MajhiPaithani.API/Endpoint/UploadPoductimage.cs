@@ -31,13 +31,13 @@ namespace MajhiPaithani.API.Endpoint
 
                     if (Taskid==1)
                     {
-                        if(imageId==0)
+                        if(imageId==null)
                         {
                           return Results.BadRequest("enter imageId please");
 
                         }
 
-                        if(!string.IsNullOrEmpty(fileUrl))
+                        if(fileUrl==null)
                         {
                             return Results.BadRequest("update file url not pass");
                         }
