@@ -16,6 +16,8 @@ namespace MajhiPaithani.API.Endpoint
             product.MapPost("api/uploadimage", async (
     [FromQuery] int? ProdcutId,
     [FromForm] int? userId,
+    [FromQuery] int? imageId,
+   [FromQuery] string? fileUrl,
     [FromForm] IFormFileCollection Files,
     AddProductImageservice service,
     HttpContext context) =>
@@ -26,8 +28,15 @@ namespace MajhiPaithani.API.Endpoint
                         return Results.BadRequest("No files uploaded.");
 
                     var fileUrls = new List<string>();
-
                     var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+                    if (!string.IsNullOrEmpty(fileUrl))
+                    {
+                        var oldFilePath = Path.Combine(wwwRootPath, fileUrl.TrimStart('/'));
+                        if (File.Exists(oldFilePath))
+                            File.Delete(oldFilePath);
+                    }
+
                     var uploadFolderPath = Path.Combine(wwwRootPath, "UploadedproductImages");
 
                     if (!Directory.Exists(uploadFolderPath))
@@ -49,7 +58,7 @@ namespace MajhiPaithani.API.Endpoint
                         }
                     }
 
-                    await service.SaveProductImagesAsync(fileUrls, ProdcutId ?? 0, userId ?? 0);
+                    await service.SaveProductImagesAsync(fileUrls, ProdcutId ?? 0, userId ?? 0, imageId ?? 0);
 
                     return Results.Ok(new
                     {

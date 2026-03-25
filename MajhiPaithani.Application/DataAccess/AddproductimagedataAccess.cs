@@ -24,36 +24,59 @@ namespace MajhiPaithani.Application.DataAccess
             httpContextAccessor = _httpContextAccessor;
         }
 
-        public async Task<string> ExecuteProductImagesAsync(List<string> fileUrls, int productid, int userId)
+        public async Task<string> ExecuteProductImagesAsync(List<string> fileUrls, int productid, int userId, int imageId)
         {
             string message = "";
 
             try
             {
                 using (var conn = new SqlConnection(_connectionString))
-                using (var cmd = new SqlCommand("AddProductImageData", conn))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
                     await conn.OpenAsync();
 
-                    foreach (var url in fileUrls)
+                    // 👉 UPDATE case
+                    if (imageId != 0 && fileUrls != null && fileUrls.Count > 0)
                     {
-                        cmd.Parameters.Clear();
-
-                        cmd.Parameters.AddWithValue("@taskid", 1);
-                        cmd.Parameters.AddWithValue("@UserId", userId);
-                        cmd.Parameters.AddWithValue("@iProductId", productid);
-                        cmd.Parameters.AddWithValue("@sImageUrl", url);
-
-                        using var reader = await cmd.ExecuteReaderAsync();
-
-                        if (await reader.ReadAsync())
+                        foreach (var url in fileUrls)
                         {
-                            message = reader["Message"]?.ToString();
-                        }
+                            using (var updateCmd = new SqlCommand(
+                                "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@sImageUrl", url);
+                                updateCmd.Parameters.AddWithValue("@iImageId", imageId);
 
-                        reader.Close();
+                                int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
+
+                                message = rowsAffected > 0 ? "Image updated successfully" : "No record found to update";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // 👉 INSERT case (existing logic)
+                        using (var cmd = new SqlCommand("AddProductImageData", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            foreach (var url in fileUrls)
+                            {
+                                cmd.Parameters.Clear();
+
+                                cmd.Parameters.AddWithValue("@taskid", 1);
+                                cmd.Parameters.AddWithValue("@UserId", userId);
+                                cmd.Parameters.AddWithValue("@iProductId", productid);
+                                cmd.Parameters.AddWithValue("@sImageUrl", url);
+
+                                using var reader = await cmd.ExecuteReaderAsync();
+
+                                if (await reader.ReadAsync())
+                                {
+                                    message = reader["Message"]?.ToString();
+                                }
+
+                                reader.Close();
+                            }
+                        }
                     }
                 }
             }
