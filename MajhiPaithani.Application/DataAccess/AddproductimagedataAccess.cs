@@ -35,7 +35,7 @@ namespace MajhiPaithani.Application.DataAccess
                 {
                     await conn.OpenAsync();
 
-                    if (imageId != 0 && imageId > 0)
+                    if (imageId > 0)
                     {
                         using (var updateCmd = new SqlCommand(
                             "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
