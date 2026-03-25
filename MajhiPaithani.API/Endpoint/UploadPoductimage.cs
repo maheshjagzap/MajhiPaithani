@@ -15,6 +15,7 @@ namespace MajhiPaithani.API.Endpoint
 
             product.MapPost("api/uploadimage", async (
     [FromQuery] int? ProdcutId,
+    [FromQuery] int? Taskid,
     [FromForm] int? userId,
     [FromQuery] int? imageId,
    [FromQuery] string? fileUrl,
@@ -24,6 +25,10 @@ namespace MajhiPaithani.API.Endpoint
             {
                 try
                 {
+                    if(Taskid==1)
+                    {
+                        return Results.BadRequest("u are pass taskid");
+                    }
                     if (Files == null || Files.Count == 0)
                         return Results.BadRequest("No files uploaded.");
 
