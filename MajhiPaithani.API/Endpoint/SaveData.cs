@@ -103,6 +103,27 @@ namespace MajhiPaithani.API.Endpoint
             .WithName("UpdateProductdeatils")
             .WithTags("Prodcuts");
 
+            savedata.MapPut("/UpdateStock", async ([FromBody] UpdateStockDto dto, [FromServices] SaveSellerService service) =>
+            {
+                try
+                {
+                    var message = await service.UpdateStockasync(dto);
+
+                    return Results.Ok(new
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = message,
+                        ProductId = dto.iProductId
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(detail: $"Error: {ex.Message}");
+                }
+            })
+            .WithName("UpdateProductStock")
+            .WithTags("Prodcuts");
+
             savedata.MapDelete("/DeleteProductdeatils/{productId}", async (int productId, [FromServices] SaveSellerService service) =>
             {
                 try

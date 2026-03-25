@@ -34,21 +34,19 @@ namespace MajhiPaithani.Application.DataAccess
                 {
                     await conn.OpenAsync();
 
-                    // 👉 UPDATE case
-                    if (imageId != 0 && fileUrls != null && fileUrls.Count > 0)
+                    if (imageId != 0 && !string.IsNullOrEmpty(fileUrl))
                     {
-                        foreach (var url in fileUrls)
+                        using (var updateCmd = new SqlCommand(
+                            "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
                         {
-                            using (var updateCmd = new SqlCommand(
-                                "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
-                            {
-                                updateCmd.Parameters.AddWithValue("@sImageUrl", url);
-                                updateCmd.Parameters.AddWithValue("@iImageId", imageId);
+                            updateCmd.Parameters.AddWithValue("@sImageUrl", fileUrl);
+                            updateCmd.Parameters.AddWithValue("@iImageId", imageId);
 
-                                int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
+                            int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
 
-                                message = rowsAffected > 0 ? "Image updated successfully" : "No record found to update";
-                            }
+                            message = rowsAffected > 0
+                                ? "Image updated successfully"
+                                : "No record found to update";
                         }
                     }
                     else

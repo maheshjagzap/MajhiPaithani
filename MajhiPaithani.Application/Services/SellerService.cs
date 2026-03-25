@@ -39,6 +39,11 @@ namespace MajhiPaithani.Application.Services
             return await _dataAccess.UpdateProductInformation(dto);
         }
 
+        public async Task<string> UpdateStockasync(UpdateStockDto dto)
+        {
+            return await _dataAccess.UpdateStockInformation(dto);
+        }
+
         public async Task<string> DeleteProductasync(int productId)
         {
             return await _dataAccess.DeleteProductInformation(productId);

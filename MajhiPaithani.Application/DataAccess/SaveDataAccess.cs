@@ -154,6 +154,34 @@ namespace MajhiPaithani.Application.DataAccess
             return message;
         }
 
+        public async Task<string> UpdateStockInformation(UpdateStockDto dto)
+        {
+            string message = "";
+
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("UPDATE Products SET istock = @istock, dUpdatedDate = GETDATE() WHERE iProductId = @iProductId", conn);
+                cmd.Parameters.AddWithValue("@iProductId", dto.iProductId);
+                cmd.Parameters.AddWithValue("@istock", dto.iStock);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                message = "stock updated successfully";
+            }
+            catch (SqlException ex)
+            {
+                message = $"SQL Error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                message = $"Error: {ex.Message}";
+            }
+
+            return message;
+        }
+
         public async Task<string> DeleteProductInformation(int productId)
         {
             string message = "";
