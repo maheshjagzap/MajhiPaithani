@@ -1,8 +1,7 @@
 ﻿using MajhiPaithani.Application.Models.Request;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,7 +34,8 @@ namespace MajhiPaithani.Application.DataAccess
                 {
                     await conn.OpenAsync();
 
-                    if (productid == 0)
+                    // 👉 UPDATE case   imageId != 0 && productid == 0
+                    if (imageId != 0 && productid == 0)
                     {
                         using (var updateCmd = new SqlCommand(
                             "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
