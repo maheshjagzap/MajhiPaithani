@@ -24,7 +24,7 @@ namespace MajhiPaithani.Application.DataAccess
             httpContextAccessor = _httpContextAccessor;
         }
 
-        public async Task<string> ExecuteProductImagesAsync(List<string> fileUrls, int productid, int userId, int imageId)
+        public async Task<string> ExecuteProductImagesAsync(List<string> fileUrls, int productid,int Taskid, int userId, int imageId)
         {
             string message = "";
 
@@ -35,7 +35,7 @@ namespace MajhiPaithani.Application.DataAccess
                     await conn.OpenAsync();
 
                     // 👉 UPDATE case   imageId != 0 && productid == 0
-                    if (imageId != 0 && productid == 0)
+                    if (Taskid==1)
                     {
                         using (var updateCmd = new SqlCommand(
                             "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))

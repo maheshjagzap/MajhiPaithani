@@ -25,22 +25,32 @@ namespace MajhiPaithani.API.Endpoint
             {
                 try
                 {
-                    if(Taskid==1)
-                    {
-                        return Results.BadRequest("u are pass taskid");// for testing purpose
-                    }
-                    if (Files == null || Files.Count == 0)
-                        return Results.BadRequest("No files uploaded.");
 
-                    var fileUrls = new List<string>();
+
                     var wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-                    if (!string.IsNullOrEmpty(fileUrl))
+                    if (Taskid==1)
                     {
+                        if(imageId==0)
+                        {
+                          return Results.BadRequest("enter imageId please");
+
+                        }
+
+                        if(!string.IsNullOrEmpty(fileUrl))
+                        {
+                            return Results.BadRequest("update file url not pass");
+                        }
+
                         var oldFilePath = Path.Combine(wwwRootPath, fileUrl.TrimStart('/'));
                         if (File.Exists(oldFilePath))
                             File.Delete(oldFilePath);
                     }
+
+                    if (Files == null || Files.Count == 0)
+                        return Results.BadRequest("No files uploaded.");
+
+                    var fileUrls = new List<string>();                   
 
                     var uploadFolderPath = Path.Combine(wwwRootPath, "UploadedproductImages");
 
@@ -63,7 +73,7 @@ namespace MajhiPaithani.API.Endpoint
                         }
                     }
 
-                    await service.SaveProductImagesAsync(fileUrls, ProdcutId ?? 0, userId ?? 0, imageId ?? 0);
+                    await service.SaveProductImagesAsync(fileUrls, ProdcutId ?? 0, Taskid ?? 0, userId ?? 0, imageId ?? 0);
 
                     return Results.Ok(new
                     {
