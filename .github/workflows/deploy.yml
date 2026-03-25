@@ -97,6 +97,6 @@ jobs:
         script: |
           powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -ne 'Started') { Start-WebAppPool -Name 'MajhiPaithani' }"
 
-    # ✅ Final success
+    # ✅ Final succes
     - name: ✅ Deployment Completed
       run: echo "Deployment Successful 🚀"
