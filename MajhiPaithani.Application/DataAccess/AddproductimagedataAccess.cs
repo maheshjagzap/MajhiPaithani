@@ -1,7 +1,8 @@
 ﻿using MajhiPaithani.Application.Models.Request;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,12 +35,12 @@ namespace MajhiPaithani.Application.DataAccess
                 {
                     await conn.OpenAsync();
 
-                    if (imageId != 0 && !string.IsNullOrEmpty(fileUrl))
+                    if (imageId != 0 && imageId > 0)
                     {
                         using (var updateCmd = new SqlCommand(
                             "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
                         {
-                            updateCmd.Parameters.AddWithValue("@sImageUrl", fileUrl);
+                            updateCmd.Parameters.AddWithValue("@sImageUrl", fileUrls);
                             updateCmd.Parameters.AddWithValue("@iImageId", imageId);
 
                             int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
