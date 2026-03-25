@@ -35,13 +35,16 @@ namespace MajhiPaithani.Application.DataAccess
                     await conn.OpenAsync();
 
                     // 👉 UPDATE case   imageId != 0 && productid == 0
-                    if (Taskid==1)
+                    if (Taskid == 1)
                     {
+                        // Convert List<string> to a single string
+                        var urls = string.Join(",", fileUrls);
+
                         using (var updateCmd = new SqlCommand(
-                            "UPDATE ProductImage SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
+                            "UPDATE ProductImages SET sImageUrl = @sImageUrl WHERE iImageId = @iImageId", conn))
                         {
-                            updateCmd.Parameters.AddWithValue("@sImageUrl", fileUrls);
-                            updateCmd.Parameters.AddWithValue("@iImageId", imageId);
+                            updateCmd.Parameters.Add("@sImageUrl", SqlDbType.NVarChar).Value = urls;
+                            updateCmd.Parameters.Add("@iImageId", SqlDbType.Int).Value = imageId;
 
                             int rowsAffected = await updateCmd.ExecuteNonQueryAsync();
 

@@ -31,17 +31,7 @@ namespace MajhiPaithani.API.Endpoint
 
                     if (Taskid==1)
                     {
-                        if(imageId==null)
-                        {
-                          return Results.BadRequest("enter imageId please");
-
-                        }
-
-                        if(fileUrl==null)
-                        {
-                            return Results.BadRequest("update file url not pass");
-                        }
-
+                       
                         var oldFilePath = Path.Combine(wwwRootPath, fileUrl.TrimStart('/'));
                         if (File.Exists(oldFilePath))
                             File.Delete(oldFilePath);
