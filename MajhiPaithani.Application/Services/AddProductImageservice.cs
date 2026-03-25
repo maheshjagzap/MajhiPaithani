@@ -21,7 +21,7 @@ namespace MajhiPaithani.Application.Services
         public async Task<string> SaveProductImagesAsync(List<string> fileUrls, int productid,int Taskid, int userId,int imageId)
         {
 
-            return await _dataAccess.ExecuteProductImagesAsync(fileUrls, Taskid, productid,userId, imageId);
+            return await _dataAccess.ExecuteProductImagesAsync(fileUrls, productid, Taskid,userId, imageId);
         }
 
         public async Task<string> UpdateProductImageAsync(int imageId, string newFilePath)
