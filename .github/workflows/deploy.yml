@@ -1,4 +1,4 @@
-name: Deploy React App to EC2 IIS (Demo)
+name: Deploy to EC2 IIS (Debug Mode)
 
 on:
   push:
@@ -7,35 +7,35 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   
 
     steps:
-    # ✅ 1. Checkout Code
     - name: 📥 Checkout Code
       uses: actions/checkout@v3
 
-    # ✅ 2. Setup Node
-    - name: ⚙️ Setup Node.js
-      uses: actions/setup-node@v3
+    - name: ⚙️ Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
-        node-version: '18'
+        dotnet-version: '8.0.x'
 
-    # ✅ 3. Install Dependencies
-    - name: 📦 Install Dependencies
-      run: npm install
+    - name: 🔄 Restore
+      run: dotnet restore
 
-    # ✅ 4. Build React App (IGNORE WARNINGS)
-    - name: 🏗️ Build React App
+    - name: 🏗️ Build
+      run: dotnet build --configuration Release
+
+    - name: 🧹 Clean Publish Folder
+      run: rm -rf publish
+
+    - name: 📦 Publish API Only
+      run: dotnet publish ./MajhiPaithani.API/MajhiPaithani.API.csproj -c Release -r win-x64 --self-contained true -o publish
+
+    - name: 📂 Show Publish Folder (DEBUG)
       run: |
-        CI=false npm run build
+        echo "Listing publish folder"
+        ls -la publish
 
-    # ✅ 5. Debug Build Folder
-    - name: 📂 Show Build Folder
-      run: |
-        echo "Build folder contents:"
-        ls -la build
-
-    # ✅ 6. Test SSH Connection
+    # ✅ Test SSH connection
     - name: 🔐 Test SSH Connection
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -47,7 +47,7 @@ jobs:
           hostname
           whoami
 
-    # ✅ 7. Stop IIS App Pool
+    # ✅ Stop IIS App Pool (SAFE - no error if already stopped)
     - name: 🛑 Stop IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -55,20 +55,30 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'Demo').Value -eq 'Started') { Stop-WebAppPool -Name 'Demo' }"
+          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -eq 'Started') { Stop-WebAppPool -Name 'MajhiPaithani' }"
 
-    # ✅ 8. Upload Build Files to IIS
-    - name: 🚀 Upload Build to EC2
+    # ✅ Clean IIS Folder (BEST PRACTICE)
+    # - name: 🧹 Clean IIS Folder
+    #   uses: appleboy/ssh-action@v1.0.0
+    #   with:
+    #     host: 15.207.106.250
+    #     username: Administrator
+    #     key: ${{ secrets.EC2_SSH_KEY }}
+    #     script: |
+    #       powershell -Command "Remove-Item -Path 'C:\inetpub\MajhiPaithaniApp\*' -Recurse -Force -ErrorAction SilentlyContinue"
+
+    # ✅ Upload files to IIS folder
+    - name: 🚀 Upload Files to EC2
       uses: appleboy/scp-action@v0.1.7
       with:
         host: 15.207.106.250
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "build/*"
-        target: "C:/inetpub/ReactApp"
+        source: "publish/*"
+        target: "C:/inetpub/MajhiPaithaniApp"
         strip_components: 1
 
-    # ✅ 9. Verify Deployment
+    # ✅ Verify deployment
     - name: 🔍 Verify Deployment
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -76,9 +86,9 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Get-ChildItem 'C:\inetpub\ReactApp'"
+          powershell -Command "Get-ChildItem 'C:\inetpub\MajhiPaithaniApp'"
 
-    # ✅ 10. Start IIS App Pool
+    # ✅ Start IIS App Pool (SAFE)
     - name: ▶️ Start IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -86,8 +96,8 @@ jobs:
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'Demo').Value -ne 'Started') { Start-WebAppPool -Name 'Demo' }"
+          powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -ne 'Started') { Start-WebAppPool -Name 'MajhiPaithani' }"
 
-    # ✅ 11. Done
+    # ✅ Final success
     - name: ✅ Deployment Completed
-      run: echo "React Deployment Successful 🚀"
+      run: echo "Deployment Successful 🚀"
