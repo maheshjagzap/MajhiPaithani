@@ -57,14 +57,14 @@ jobs:
           powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -eq 'Started') { Stop-WebAppPool -Name 'MajhiPaithani' }"
       
         # ✅ Clean IIS Folder (BEST PRACTICE)
-    - name: 🧹 Clean IIS Folder
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: 15.207.106.250
-        username: Administrator
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          powershell -Command "Remove-Item -Path 'C:\inetpub\MajhiPaithaniApp\*' -Recurse -Force -ErrorAction SilentlyContinue"
+    # - name: 🧹 Clean IIS Folder
+    #   uses: appleboy/ssh-action@v1.0.0
+    #   with:
+    #     host: 15.207.106.250
+    #     username: Administrator
+    #     key: ${{ secrets.EC2_SSH_KEY }}
+    #     script: |
+    #       powershell -Command "Remove-Item -Path 'C:\inetpub\MajhiPaithaniApp\*' -Recurse -Force -ErrorAction SilentlyContinue"
    
     # ✅ Upload files to IIS folder
     - name: 🚀 Upload Files to EC2
