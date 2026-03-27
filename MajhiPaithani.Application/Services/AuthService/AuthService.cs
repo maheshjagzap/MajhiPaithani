@@ -14,10 +14,16 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly IJwtTokenService _jwtTokenService;
-    public AuthService(ApplicationDbContext context, IJwtTokenService jwtTokenService)
+    private readonly IEmailService _emailService;
+
+    // In-memory OTP store: email -> (otp, expiry)
+    private static readonly Dictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
+
+    public AuthService(ApplicationDbContext context, IJwtTokenService jwtTokenService, IEmailService emailService)
     {
         _context = context;
         _jwtTokenService = jwtTokenService;
+        _emailService = emailService;
     }
 
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
@@ -136,6 +142,54 @@ public class AuthService : IAuthService
         {
             Message = "Password changed successfully"
         };
+    }
+
+    public async Task<ForgotPasswordResponse> ForgotPasswordAsync(ForgotPasswordRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.SEmail == request.Email);
+        if (user == null)
+            throw new Exception("No account found with this email");
+
+        var otp = new Random().Next(100000, 999999).ToString();
+        _otpStore[request.Email] = (otp, DateTime.UtcNow.AddMinutes(10));
+
+        await _emailService.SendEmailAsync(
+            request.Email,
+            "Password Reset OTP - MajhiPaithani",
+            $"Your OTP for password reset is: {otp}. It is valid for 10 minutes."
+        );
+
+        return new ForgotPasswordResponse { Message = "OTP sent to your email" };
+    }
+
+    public Task<ForgotPasswordResponse> VerifyOtpAsync(VerifyOtpRequest request)
+    {
+        if (!_otpStore.TryGetValue(request.Email, out var entry) ||
+            entry.Otp != request.Otp ||
+            entry.Expiry < DateTime.UtcNow)
+            throw new UnauthorizedException("Invalid or expired OTP");
+
+        return Task.FromResult(new ForgotPasswordResponse { Message = "OTP verified successfully" });
+    }
+
+    public async Task<ForgotPasswordResponse> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        if (!_otpStore.TryGetValue(request.Email, out var entry) ||
+            entry.Otp != request.Otp ||
+            entry.Expiry < DateTime.UtcNow)
+            throw new UnauthorizedException("Invalid or expired OTP");
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.SEmail == request.Email);
+        if (user == null)
+            throw new Exception("User not found");
+
+        user.SPasswordHash = request.NewPassword;
+        user.DUpdatedDate = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        _otpStore.Remove(request.Email);
+
+        return new ForgotPasswordResponse { Message = "Password reset successfully" };
     }
 }
 
