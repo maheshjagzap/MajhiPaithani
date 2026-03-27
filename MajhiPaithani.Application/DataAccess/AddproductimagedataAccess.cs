@@ -197,6 +197,7 @@ namespace MajhiPaithani.Application.DataAccess
                             sProductTitle = reader["sProductTitle"]?.ToString(),
                             sDescription = reader["sDescription"]?.ToString(),
                             dcBasePrice = Convert.ToDecimal(reader["dcBasePrice"]),
+                            productstock = reader["productstock"] == DBNull.Value ? 0 : Convert.ToInt32(reader["productstock"]),
                             sColor = reader["sColor"]?.ToString(),
                             sFabric = reader["sFabric"]?.ToString(),
                             sDesignType = reader["sDesignType"]?.ToString(),

@@ -27,6 +27,7 @@ namespace MajhiPaithani.Application.Models.Request
         public string sProductTitle { get; set; }
         public string sDescription { get; set; }
         public decimal dcBasePrice { get; set; }
+        public int productstock { get; set; }
         public string sColor { get; set; }
         public string sFabric { get; set; }
         public string sDesignType { get; set; }
