@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
 namespace MajhiPaithani.Infrastructure.Entities;
 
-public partial class Cart
+public class Cart
 {
-    public int ICartId { get; set; }
-
-    public int? ICustomerId { get; set; }
-
-    public DateTime? DCreatedDate { get; set; }
-
-    public DateTime? DUpdatedDate { get; set; }
+    public int CartId { get; set; }
+    public int IUserId { get; set; }
+    public string? Status { get; set; }
+    public DateTime DtCreated { get; set; }
+    public DateTime? DtUpdated { get; set; }
 }
