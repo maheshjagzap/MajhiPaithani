@@ -1,4 +1,4 @@
-﻿using MajhiPaithani.Application.Interfaces.IAuthService;
+using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Models.Request;
 using MajhiPaithani.Application.Models.Request.MajhiPaithani.Application.Models.Request;
 using MajhiPaithani.Application.Models.Response;
@@ -29,14 +29,18 @@ public class AuthService : IAuthService
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {
      
-        var existingUser = await _context.Users
-            .FirstOrDefaultAsync(x => x.SEmail == request.sEmail);
+        var emailExists = await _context.Users.AnyAsync(x => x.SEmail == request.sEmail);
 
-        if (existingUser != null)
-        {
-            throw new ConflictException("User already exists");
-        }
+        if (emailExists)
+            throw new ConflictException("This email already exists");
+
+        var mobileExists = await _context.Users.AnyAsync(x => x.SPhoneNumber == request.sPhoneNumber);
+
+        if (mobileExists)
+            throw new ConflictException("This mobile number already exists");
+
         bool IsSellerProfileComplete;
+
         if (request.RoleId ==2)
         {
             IsSellerProfileComplete = false;
@@ -72,6 +76,7 @@ public class AuthService : IAuthService
     public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         Seller? seller = null;
+        UserAddress? userAddress = null;
 
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.SEmail == request.EmailOrPhone 
@@ -86,6 +91,11 @@ public class AuthService : IAuthService
         {
             seller = await _context.Sellers
                 .FirstOrDefaultAsync(x => x.IUserId == user.IUserId);
+        }
+        else if (user.IRoleId == 3)
+        {
+            userAddress = await _context.UserAddresses
+                .FirstOrDefaultAsync(x => x.UserId == user.IUserId && x.IsDefault == true);
         }
 
         var role = user.IRoleId == 1 ? "Admin" : user.IRoleId == 2 ? "Seller" : user.IRoleId == 3 ? "Customer" : "";
@@ -111,7 +121,17 @@ public class AuthService : IAuthService
             IsSeller = seller != null,
             SellerId = seller?.ISellerId,
             Token = token,
-            Message = "Login successful"
+            Message = "Login successful",
+            Address = userAddress == null ? null : new UserAddressResponse
+            {
+                AddressLine1 = userAddress.AddressLine1,
+                AddressLine2 = userAddress.AddressLine2,
+                City = userAddress.City,
+                State = userAddress.State,
+                PostalCode = userAddress.PostalCode,
+                Country = userAddress.Country,
+                AddressType = userAddress.AddressType
+            }
         };
     }
 
