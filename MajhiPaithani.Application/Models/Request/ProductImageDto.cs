@@ -23,6 +23,8 @@ namespace MajhiPaithani.Application.Models.Request
     {
         public int iProductId { get; set; }
         public int iSellerId { get; set; }
+        public int sellerUserId { get; set; }
+        public string sellerName { get; set; }
         public int iCategoryId { get; set; }
         public string sProductTitle { get; set; }
         public string sDescription { get; set; }

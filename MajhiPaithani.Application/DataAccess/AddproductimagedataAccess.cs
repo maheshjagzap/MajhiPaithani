@@ -193,6 +193,8 @@ namespace MajhiPaithani.Application.DataAccess
                         {
                             iProductId = productId,
                             iSellerId = Convert.ToInt32(reader["iSellerId"]),
+                            sellerUserId = reader["sellerUserId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["sellerUserId"]),
+                            sellerName = reader["sellername"]?.ToString(),
                             iCategoryId = Convert.ToInt32(reader["iCategoryId"]),
                             sProductTitle = reader["sProductTitle"]?.ToString(),
                             sDescription = reader["sDescription"]?.ToString(),
