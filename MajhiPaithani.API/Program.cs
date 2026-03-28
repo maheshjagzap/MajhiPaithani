@@ -4,6 +4,8 @@ using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
 using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
+using MajhiPaithani.Application.Interfaces.ICustomerService;
+using MajhiPaithani.Application.Services.CustomerService;
 using MajhiPaithani.Application.Services;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Services;
@@ -52,6 +54,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Application Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddHttpContextAccessor();
