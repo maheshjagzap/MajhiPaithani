@@ -42,8 +42,6 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
-    public virtual DbSet<CustomerAddress> CustomerAddresses { get; set; }
-
     public virtual DbSet<CustomizationRequest> CustomizationRequests { get; set; }
 
     public virtual DbSet<Location> Locations { get; set; }
@@ -220,45 +218,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("dCreatedDate");
             entity.Property(e => e.DDeletedDate).HasColumnName("dDeletedDate");
             entity.Property(e => e.IUserId).HasColumnName("iUserId");
-        });
-
-        modelBuilder.Entity<CustomerAddress>(entity =>
-        {
-            entity.HasKey(e => e.IAddressId).HasName("PK__Customer__C6E4D70D1247776F");
-
-            entity.Property(e => e.IAddressId).HasColumnName("iAddressId");
-            entity.Property(e => e.BIsDefault)
-                .HasDefaultValue(false)
-                .HasColumnName("bIsDefault");
-            entity.Property(e => e.BIsDeleted)
-                .HasDefaultValue(false)
-                .HasColumnName("bIsDeleted");
-            entity.Property(e => e.DCreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("dCreatedDate");
-            entity.Property(e => e.DDeletedDate).HasColumnName("dDeletedDate");
-            entity.Property(e => e.ICustomerId).HasColumnName("iCustomerId");
-            entity.Property(e => e.SAddressLine1)
-                .HasMaxLength(500)
-                .HasColumnName("sAddressLine1");
-            entity.Property(e => e.SAddressLine2)
-                .HasMaxLength(500)
-                .HasColumnName("sAddressLine2");
-            entity.Property(e => e.SCity)
-                .HasMaxLength(150)
-                .HasColumnName("sCity");
-            entity.Property(e => e.SFullName)
-                .HasMaxLength(200)
-                .HasColumnName("sFullName");
-            entity.Property(e => e.SPhoneNumber)
-                .HasMaxLength(50)
-                .HasColumnName("sPhoneNumber");
-            entity.Property(e => e.SPincode)
-                .HasMaxLength(20)
-                .HasColumnName("sPincode");
-            entity.Property(e => e.SState)
-                .HasMaxLength(150)
-                .HasColumnName("sState");
         });
 
         modelBuilder.Entity<CustomizationRequest>(entity =>
