@@ -107,33 +107,20 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasKey(e => e.ICartId).HasName("PK__Cart__7B40985777FFF8B8");
-
+            entity.HasKey(e => e.CartId);
             entity.ToTable("Cart");
-
-            entity.Property(e => e.ICartId).HasColumnName("iCartId");
-            entity.Property(e => e.DCreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("dCreatedDate");
-            entity.Property(e => e.DUpdatedDate).HasColumnName("dUpdatedDate");
-            entity.Property(e => e.ICustomerId).HasColumnName("iCustomerId");
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.DtCreated).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<CartItem>(entity =>
         {
-            entity.HasKey(e => e.ICartItemId).HasName("PK__CartItem__FFFAC7A81BD443CD");
-
-            entity.Property(e => e.ICartItemId).HasColumnName("iCartItemId");
-            entity.Property(e => e.DCreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnName("dCreatedDate");
-            entity.Property(e => e.DcPrice)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("dcPrice");
-            entity.Property(e => e.ICartId).HasColumnName("iCartId");
-            entity.Property(e => e.IProductId).HasColumnName("iProductId");
-            entity.Property(e => e.IQuantity).HasColumnName("iQuantity");
-            entity.Property(e => e.ISellerId).HasColumnName("iSellerId");
+            entity.HasKey(e => e.CartItemId);
+            entity.ToTable("CartItems");
+            entity.Property(e => e.PriceAtTime).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Quantity).HasDefaultValue(1);
+            entity.Property(e => e.IsAvailable).HasDefaultValue(true);
+            entity.Property(e => e.DtCreated).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<Category>(entity =>
