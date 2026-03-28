@@ -37,6 +37,7 @@ namespace MajhiPaithani.Application.Models.Response
 
             public class UserAddressResponse
             {
+                public int AddressId { get; set; }
                 public string? AddressLine1 { get; set; }
                 public string? AddressLine2 { get; set; }
                 public string? City { get; set; }

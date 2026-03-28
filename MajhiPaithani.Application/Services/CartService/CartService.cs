@@ -98,24 +98,76 @@ namespace MajhiPaithani.Application.Services.CartService
             if (cart == null)
                 return new CartResponse { UserId = userId, Status = "Empty", Items = new() };
 
-            var items = await (
+            var cartItems = await (
                 from ci in _context.CartItems
                 join p in _context.Products on ci.IProductId equals p.IProductId
-                join pi in _context.ProductImages on p.IProductId equals pi.IProductId into images
-                from pi in images.Where(x => x.BIsPrimary == true).DefaultIfEmpty()
+                join s in _context.Sellers on p.ISellerId equals s.ISellerId into sellers
+                from s in sellers.DefaultIfEmpty()
+                join u in _context.Users on s.IUserId equals u.IUserId into sellerUsers
+                from u in sellerUsers.DefaultIfEmpty()
                 where ci.ICartId == cart.CartId
-                select new CartItemDetail
+                select new
                 {
-                    CartItemId = ci.CartItemId,
-                    ProductId = p.IProductId,
-                    ProductTitle = p.SProductTitle,
-                    ProductImage = pi != null ? pi.SImageUrl : null,
-                    SellerId = ci.ISellerId,
-                    Quantity = ci.Quantity,
-                    PriceAtTime = ci.PriceAtTime,
-                    IsAvailable = ci.IsAvailable
+                    ci.CartItemId,
+                    ci.Quantity,
+                    ci.PriceAtTime,
+                    ci.IsAvailable,
+                    p.IProductId,
+                    p.ISellerId,
+                    SellerUserId = (int?)s.IUserId,
+                    SellerName = u != null ? (u.SFirstName + " " + u.SLastName) : null,
+                    p.ICategoryId,
+                    p.SProductTitle,
+                    p.SDescription,
+                    p.DcBasePrice,
+                    p.SColor,
+                    p.SFabric,
+                    p.SDesignType,
+                    p.BIsCustomizationAvailable,
+                    p.BIsActive,
+                    p.BIsDeleted,
+                    ProductCreatedDate = p.DCreatedDate,
+                    ProductUpdatedDate = p.DUpdatedDate
                 }
             ).ToListAsync();
+
+            // Fetch all images for the products in this cart in one query
+            var productIds = cartItems.Select(x => x.IProductId).Distinct().ToList();
+            var allImages = await _context.ProductImages
+                .Where(pi => pi.IProductId != null && productIds.Contains(pi.IProductId.Value) && pi.isDeleted != true)
+                .Select(pi => new CartProductImageDto
+                {
+                    IImageId = pi.IImageId,
+                    SImageUrl = pi.SImageUrl,
+                    BIsPrimary = pi.BIsPrimary,
+                    ProductId = pi.IProductId ?? 0
+                })
+                .ToListAsync();
+
+            var items = cartItems.Select(ci => new CartItemDetail
+            {
+                CartItemId = ci.CartItemId,
+                Quantity = ci.Quantity,
+                PriceAtTime = ci.PriceAtTime,
+                IsAvailable = ci.IsAvailable,
+                IProductId = ci.IProductId,
+                ISellerId = ci.ISellerId,
+                SellerUserId = ci.SellerUserId,
+                SellerName = ci.SellerName,
+                ICategoryId = ci.ICategoryId,
+                SProductTitle = ci.SProductTitle,
+                SDescription = ci.SDescription,
+                DcBasePrice = ci.DcBasePrice,
+                SColor = ci.SColor,
+                SFabric = ci.SFabric,
+                SDesignType = ci.SDesignType,
+                BIsCustomizationAvailable = ci.BIsCustomizationAvailable,
+                BIsActive = ci.BIsActive,
+                BIsDeleted = ci.BIsDeleted,
+                ProductCreatedDate = ci.ProductCreatedDate,
+                ProductUpdatedDate = ci.ProductUpdatedDate,
+                Images = allImages.Where(img => img.ProductId == ci.IProductId).ToList()
+            }).ToList();
 
             return new CartResponse
             {

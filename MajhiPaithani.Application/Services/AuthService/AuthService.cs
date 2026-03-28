@@ -124,6 +124,7 @@ public class AuthService : IAuthService
             Message = "Login successful",
             Address = userAddress == null ? null : new UserAddressResponse
             {
+                AddressId = userAddress.AddressId,
                 AddressLine1 = userAddress.AddressLine1,
                 AddressLine2 = userAddress.AddressLine2,
                 City = userAddress.City,
