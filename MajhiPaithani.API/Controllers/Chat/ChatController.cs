@@ -20,27 +20,16 @@ public class ChatController : ControllerBase
         _hubContext = hubContext;
     }
 
-    /// <summary>
-    /// PURPOSE: Send a message from one user to another.
-    /// Internally checks if a chat room already exists between sender and receiver:
-    ///   - If YES => reuses the existing room
-    ///   - If NO  => creates a new room automatically
-    /// Saves the message to DB, broadcasts it via SignalR, and returns roomId + sentMessage.
-    ///
-    /// Example:
-    ///   POST /api/chat/send
-    ///   { "senderId": 1, "receiverId": 4, "message": "Hello!" }
-    ///   => { roomId: 1, sentMessage: { ... } }
-    /// </summary>
+    // ─────────────────────────────────────────────
+    // POST /api/chat/send
+    // ─────────────────────────────────────────────
     [HttpPost("send")]
     public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest request)
     {
-        // Step 1: Find existing room between these two users (in either direction)
         var room = await _db.ChatRooms.FirstOrDefaultAsync(r =>
             (r.ICustomerId == request.SenderId && r.ISellerId == request.ReceiverId) ||
             (r.ICustomerId == request.ReceiverId && r.ISellerId == request.SenderId));
 
-        // Step 2: No room found — create one now
         if (room == null)
         {
             room = new ChatRoom
@@ -53,7 +42,6 @@ public class ChatController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
-        // Step 3: Save the message linked to the room
         var chatMessage = new ChatMessage
         {
             IChatRoomId = room.IChatRoomId,
@@ -80,28 +68,78 @@ public class ChatController : ControllerBase
             chatMessage.BIsRead
         };
 
-        // Step 4: Push the new message in real-time to all SignalR clients in this room
-        await _hubContext.Clients.Group(room.IChatRoomId.ToString()).SendAsync("ReceiveMessage", sentMessage);
+        // Push new message to anyone with the chat window open
+        await _hubContext.Clients.Group($"room_{room.IChatRoomId}").SendAsync("ReceiveMessage", sentMessage);
+
+        // Push to receiver's personal channel (notification badge)
+        await _hubContext.Clients.Group($"user_{request.ReceiverId}").SendAsync("NewMessageNotification", sentMessage);
+
+        // Build conversation update payload for both users to refresh their inbox
+        var senderUser = await _db.Users.Where(u => u.IUserId == request.SenderId)
+            .Select(u => new { u.IUserId, u.SFirstName, u.SLastName }).FirstOrDefaultAsync();
+
+        var receiverUser = await _db.Users.Where(u => u.IUserId == request.ReceiverId)
+            .Select(u => new { u.IUserId, u.SFirstName, u.SLastName }).FirstOrDefaultAsync();
+
+        var unreadCount = await _db.ChatMessages
+            .CountAsync(m => m.IChatRoomId == room.IChatRoomId && m.IReceiverUserId == request.ReceiverId && !m.BIsRead);
+
+        // For sender: otherUser is the receiver
+        var conversationForSender = new
+        {
+            roomId = room.IChatRoomId,
+            otherUserId = request.ReceiverId,
+            otherUserName = receiverUser != null ? $"{receiverUser.SFirstName} {receiverUser.SLastName}".Trim() : "",
+            lastMessage = request.Message,
+            lastMessageTime = chatMessage.DSentDate,
+            unreadCount = 0  // sender has no unread in their own sent message
+        };
+
+        // For receiver: otherUser is the sender
+        var conversationForReceiver = new
+        {
+            roomId = room.IChatRoomId,
+            otherUserId = request.SenderId,
+            otherUserName = senderUser != null ? $"{senderUser.SFirstName} {senderUser.SLastName}".Trim() : "",
+            lastMessage = request.Message,
+            lastMessageTime = chatMessage.DSentDate,
+            unreadCount
+        };
+
+        await _hubContext.Clients.Group($"user_{request.SenderId}").SendAsync("ConversationUpdated", conversationForSender);
+        await _hubContext.Clients.Group($"user_{request.ReceiverId}").SendAsync("ConversationUpdated", conversationForReceiver);
 
         return Ok(new { roomId = room.IChatRoomId, sentMessage });
     }
 
-    /// <summary>
-    /// PURPOSE: Load full chat history between two users when they open the chat window.
-    /// Returns roomId + all past messages ordered oldest to newest.
-    /// Returns roomId as null and empty messages if they have never chatted before.
-    ///
-    /// Example:
-    ///   GET /api/chat/history?senderId=1&receiverId=4
-    ///   => { roomId: 1, messages: [...] }
-    ///   => { roomId: null, messages: [] }  (first time chatting)
-    /// </summary>
+    // ─────────────────────────────────────────────
+    // GET /api/chat/history
+    // Supports both:
+    //   ?roomId=5                        (primary — use this when you already have roomId)
+    //   ?senderId=101&receiverId=55      (fallback — for first open before roomId is known)
+    // ─────────────────────────────────────────────
     [HttpGet("history")]
-    public async Task<IActionResult> GetHistory([FromQuery] int senderId, [FromQuery] int receiverId)
+    public async Task<IActionResult> GetHistory(
+        [FromQuery] int? roomId,
+        [FromQuery] int? senderId,
+        [FromQuery] int? receiverId)
     {
-        var room = await _db.ChatRooms.FirstOrDefaultAsync(r =>
-            (r.ICustomerId == senderId && r.ISellerId == receiverId) ||
-            (r.ICustomerId == receiverId && r.ISellerId == senderId));
+        ChatRoom? room = null;
+
+        if (roomId.HasValue)
+        {
+            room = await _db.ChatRooms.FirstOrDefaultAsync(r => r.IChatRoomId == roomId.Value);
+        }
+        else if (senderId.HasValue && receiverId.HasValue)
+        {
+            room = await _db.ChatRooms.FirstOrDefaultAsync(r =>
+                (r.ICustomerId == senderId && r.ISellerId == receiverId) ||
+                (r.ICustomerId == receiverId && r.ISellerId == senderId));
+        }
+        else
+        {
+            return BadRequest("Provide either roomId or both senderId and receiverId.");
+        }
 
         if (room == null)
             return Ok(new { roomId = (int?)null, messages = Array.Empty<object>() });
@@ -125,50 +163,78 @@ public class ChatController : ControllerBase
         return Ok(new { roomId = room.IChatRoomId, messages });
     }
 
-    //    [HttpPost("mark-delivered")]
-    //    public async Task<IActionResult> MarkDelivered([FromBody] MarkStatusRequest request)
-    //    {
-    //        var messages = await _db.ChatMessages
-    //            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsDelivered)
-    //            .ToListAsync();
+    // ─────────────────────────────────────────────
+    // GET /api/chat/conversations?userId=101
+    // Returns all conversations for a user, sorted by latest message DESC
+    // ─────────────────────────────────────────────
+    [HttpGet("conversations")]
+    public async Task<IActionResult> GetConversations([FromQuery] int userId)
+    {
+        // Get all rooms where this user is either customer or seller side
+        var rooms = await _db.ChatRooms
+            .Where(r => r.ICustomerId == userId || r.ISellerId == userId)
+            .ToListAsync();
 
-    //        if (!messages.Any()) return Ok();
+        if (!rooms.Any())
+            return Ok(new List<object>());
 
-    //        foreach (var m in messages)
-    //        {
-    //            m.BIsDelivered = true;
-    //            m.DDeliveredDate = DateTime.UtcNow;
-    //        }
-    //        await _db.SaveChangesAsync();
+        var roomIds = rooms.Select(r => r.IChatRoomId).ToList();
 
-    //        var ids = messages.Select(m => m.IMessageId).ToList();
-    //        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesDelivered", ids);
-    //        return Ok();
-    //    }
+        // Get latest message per room in one query
+        var latestMessages = await _db.ChatMessages
+            .Where(m => m.IChatRoomId != null && roomIds.Contains(m.IChatRoomId.Value))
+            .GroupBy(m => m.IChatRoomId)
+            .Select(g => g.OrderByDescending(m => m.DSentDate).First())
+            .ToListAsync();
 
-    //    [HttpPost("mark-read")]
-    //    public async Task<IActionResult> MarkRead([FromBody] MarkStatusRequest request)
-    //    {
-    //        var messages = await _db.ChatMessages
-    //            .Where(m => m.IChatRoomId == request.RoomId && m.IReceiverUserId == request.UserId && !m.BIsRead)
-    //            .ToListAsync();
+        // Get unread counts per room for this user
+        var unreadCounts = await _db.ChatMessages
+            .Where(m => m.IChatRoomId != null && roomIds.Contains(m.IChatRoomId.Value)
+                     && m.IReceiverUserId == userId && !m.BIsRead)
+            .GroupBy(m => m.IChatRoomId)
+            .Select(g => new { RoomId = g.Key, Count = g.Count() })
+            .ToListAsync();
 
-    //        if (!messages.Any()) return Ok();
+        // Collect all other user IDs to fetch names in one query
+        var otherUserIds = rooms
+            .Select(r => r.ICustomerId == userId ? r.ISellerId : r.ICustomerId)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToList();
 
-    //        foreach (var m in messages)
-    //        {
-    //            m.BIsRead = true;
-    //            m.BIsDelivered = true;
-    //            m.DReadDate = DateTime.UtcNow;
-    //            m.DDeliveredDate ??= DateTime.UtcNow;
-    //        }
-    //        await _db.SaveChangesAsync();
+        var users = await _db.Users
+            .Where(u => otherUserIds.Contains(u.IUserId))
+            .Select(u => new { u.IUserId, u.SFirstName, u.SLastName })
+            .ToListAsync();
 
-    //        var ids = messages.Select(m => m.IMessageId).ToList();
-    //        await _hubContext.Clients.Group(request.RoomId.ToString()).SendAsync("MessagesRead", ids);
-    //        return Ok();
-    //    }
-    //}
+        var unreadDict = unreadCounts.ToDictionary(x => x.RoomId ?? 0, x => x.Count);
+        var userDict = users.ToDictionary(u => u.IUserId);
+
+        var conversations = rooms
+            .Select(room =>
+            {
+                var otherUserId = room.ICustomerId == userId ? room.ISellerId : room.ICustomerId;
+                var latest = latestMessages.FirstOrDefault(m => m.IChatRoomId == room.IChatRoomId);
+                var unread = unreadDict.TryGetValue(room.IChatRoomId, out var count) ? count : 0;
+                var otherUser = otherUserId.HasValue && userDict.TryGetValue(otherUserId.Value, out var u) ? u : null;
+
+                return new
+                {
+                    roomId = room.IChatRoomId,
+                    otherUserId = otherUserId ?? 0,
+                    otherUserName = otherUser != null ? $"{otherUser.SFirstName} {otherUser.SLastName}".Trim() : "Unknown",
+                    lastMessage = latest?.SMessage ?? "",
+                    lastMessageTime = latest?.DSentDate,
+                    unreadCount = unread
+                };
+            })
+            .Where(c => c.lastMessageTime.HasValue)   // exclude rooms with no messages yet
+            .OrderByDescending(c => c.lastMessageTime)
+            .ToList<object>();
+
+        return Ok(conversations);
+    }
 }
+
 public record SendMessageRequest(int SenderId, int ReceiverId, string Message);
-public record MarkStatusRequest(int RoomId, int UserId);
