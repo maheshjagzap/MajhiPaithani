@@ -7,6 +7,7 @@ using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Application.Services;
 using MajhiPaithani.Infrastructure.Data.ApplicationDbContext;
 using MajhiPaithani.Infrastructure.Services;
+using MajhiPaithani.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddHttpContextAccessor();
 // Authentication & JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -8,6 +8,7 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest   
+
     steps:
     - name: 📥 Checkout Code
       uses: actions/checkout@v3
@@ -46,7 +47,7 @@ jobs:
           hostname
           whoami
 
-      # ✅ Stop IIS App Pool (SAFE - no error if already stopped)
+    # ✅ Stop IIS App Pool (SAFE - no error if already stopped)
     - name: 🛑 Stop IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -55,8 +56,8 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -eq 'Started') { Stop-WebAppPool -Name 'MajhiPaithani' }"
-      
-        # ✅ Clean IIS Folder (BEST PRACTICE)
+
+    # ✅ Clean IIS Folder (BEST PRACTICE)
     # - name: 🧹 Clean IIS Folder
     #   uses: appleboy/ssh-action@v1.0.0
     #   with:
@@ -65,7 +66,7 @@ jobs:
     #     key: ${{ secrets.EC2_SSH_KEY }}
     #     script: |
     #       powershell -Command "Remove-Item -Path 'C:\inetpub\MajhiPaithaniApp\*' -Recurse -Force -ErrorAction SilentlyContinue"
-   
+
     # ✅ Upload files to IIS folder
     - name: 🚀 Upload Files to EC2
       uses: appleboy/scp-action@v0.1.7
@@ -97,6 +98,6 @@ jobs:
         script: |
           powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'MajhiPaithani').Value -ne 'Started') { Start-WebAppPool -Name 'MajhiPaithani' }"
 
-    # ✅ Final succes
+    # ✅ Final success
     - name: ✅ Deployment Completed
       run: echo "Deployment Successful 🚀"

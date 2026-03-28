@@ -86,6 +86,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Wishlist> Wishlists { get; set; }
 
+    public virtual DbSet<UserAddress> UserAddresses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AdminLog>(entity =>
