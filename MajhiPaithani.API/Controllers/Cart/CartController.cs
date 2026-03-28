@@ -13,28 +13,28 @@ public class CartController : ControllerBase
         _cartService = cartService;
     }
 
-    [HttpPost("add")]
+    [HttpPost("add-to-cart")]
     public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
     {
         var result = await _cartService.AddToCartAsync(request);
         return Ok(result);
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("get-cart-list/{userId}")]
     public async Task<IActionResult> GetCart(int userId)
     {
         var result = await _cartService.GetCartByUserIdAsync(userId);
         return Ok(result);
     }
 
-    [HttpPut("item/{cartItemId}")]
+    [HttpPut("update-quantity/{cartItemId}")]
     public async Task<IActionResult> UpdateQuantity(int cartItemId, [FromBody] UpdateCartItemRequest request)
     {
         var result = await _cartService.UpdateCartItemQuantityAsync(cartItemId, request);
         return Ok(result);
     }
 
-    [HttpDelete("item/{cartItemId}")]
+    [HttpDelete("delete-item-from-cart/{cartItemId}")]
     public async Task<IActionResult> RemoveItem(int cartItemId)
     {
         var result = await _cartService.RemoveCartItemAsync(cartItemId);
