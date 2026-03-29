@@ -33,6 +33,7 @@ namespace MajhiPaithani.Application.Models.Response
                 public string Token { get; set; }
                 public string Message { get; set; }
                 public UserAddressResponse? Address { get; set; }
+                public int CartItemCount { get; set; }
             }
 
             public class UserAddressResponse

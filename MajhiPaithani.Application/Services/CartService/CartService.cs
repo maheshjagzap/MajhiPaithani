@@ -75,6 +75,8 @@ namespace MajhiPaithani.Application.Services.CartService
 
             await _context.SaveChangesAsync();
 
+            var cartItemCount = await _context.CartItems.CountAsync(ci => ci.ICartId == cart.CartId);
+
             return new AddToCartResponse
             {
                 CartId = cart.CartId,
@@ -82,7 +84,8 @@ namespace MajhiPaithani.Application.Services.CartService
                 ProductId = existingItem.IProductId,
                 Quantity = existingItem.Quantity,
                 PriceAtTime = existingItem.PriceAtTime,
-                Message = message
+                Message = message,
+                CartItemCount = cartItemCount
             };
         }
 
