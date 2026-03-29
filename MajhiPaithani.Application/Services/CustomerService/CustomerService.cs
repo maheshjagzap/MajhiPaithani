@@ -153,5 +153,15 @@ namespace MajhiPaithani.Application.Services.CustomerService
                 IsDefault = address.IsDefault
             };
         }
+        public async Task<bool> DeleteCustomerAddressAsync(int addressId)
+        {
+            var address = await _context.UserAddresses.FirstOrDefaultAsync(x => x.AddressId == addressId);
+            if (address == null)
+                throw new NotFoundException("Address not found");
+
+            _context.UserAddresses.Remove(address);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
