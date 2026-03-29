@@ -223,7 +223,9 @@ namespace MajhiPaithani.Application.Services.CartService
             _context.CartItems.Remove(cartItem);
             await _context.SaveChangesAsync();
 
-            return new RemoveCartItemResponse { Success = true, Message = "Item removed from cart." };
+            var cartItemCount = await _context.CartItems.CountAsync(ci => ci.ICartId == cartItem.ICartId);
+
+            return new RemoveCartItemResponse { Success = true, Message = "Item removed from cart.", CartItemCount = cartItemCount };
         }
     }
 }

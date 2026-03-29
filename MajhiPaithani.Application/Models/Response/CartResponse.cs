@@ -66,5 +66,6 @@ namespace MajhiPaithani.Application.Models.Response
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        public int CartItemCount { get; set; }
     }
 }
