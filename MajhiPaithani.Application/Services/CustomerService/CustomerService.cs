@@ -88,6 +88,30 @@ namespace MajhiPaithani.Application.Services.CustomerService
             };
         }
 
+        public async Task<List<GetCustomerAddressesResponse>> GetCustomerAddressesAsync(int userId)
+        {
+            var userExists = await _context.Users.AnyAsync(x => x.IUserId == userId);
+            if (!userExists)
+                throw new NotFoundException("User not found");
+
+            return await _context.UserAddresses
+                .Where(x => x.UserId == userId)
+                .Select(x => new GetCustomerAddressesResponse
+                {
+                    AddressId = x.AddressId,
+                    UserId = x.UserId,
+                    AddressLine1 = x.AddressLine1,
+                    AddressLine2 = x.AddressLine2,
+                    City = x.City,
+                    State = x.State,
+                    PostalCode = x.PostalCode,
+                    Country = x.Country,
+                    AddressType = x.AddressType,
+                    IsDefault = x.IsDefault
+                })
+                .ToListAsync();
+        }
+
         public async Task<UpdateCustomerAddressResponse> UpdateCustomerAddressAsync(int addressId, UpdateCustomerAddressRequest request)
         {
             var address = await _context.UserAddresses.FirstOrDefaultAsync(x => x.AddressId == addressId);

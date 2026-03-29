@@ -8,5 +8,6 @@ namespace MajhiPaithani.Application.Interfaces.ICustomerService
         Task<UpdateCustomerResponse> UpdateCustomerAsync(int userId, UpdateCustomerRequest request);
         Task<AddCustomerAddressResponse> AddCustomerAddressAsync(AddCustomerAddressRequest request);
         Task<UpdateCustomerAddressResponse> UpdateCustomerAddressAsync(int addressId, UpdateCustomerAddressRequest request);
+        Task<List<GetCustomerAddressesResponse>> GetCustomerAddressesAsync(int userId);
     }
 }

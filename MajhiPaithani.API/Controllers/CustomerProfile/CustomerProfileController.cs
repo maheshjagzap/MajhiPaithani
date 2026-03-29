@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/customer")]
+[Route("api/CustomerProfile")]
 //[Authorize(Roles = "Customer")]
-public class CustomerController : ControllerBase
+public class CustomerProfileController : ControllerBase
 {
     private readonly ICustomerService _customerService;
 
-    public CustomerController(ICustomerService customerService)
+    public CustomerProfileController(ICustomerService customerService)
     {
         _customerService = customerService;
     }
@@ -33,6 +33,13 @@ public class CustomerController : ControllerBase
     public async Task<IActionResult> UpdateAddress(int addressId, UpdateCustomerAddressRequest request)
     {
         var result = await _customerService.UpdateCustomerAddressAsync(addressId, request);
+        return Ok(result);
+    }
+
+    [HttpGet("{userId}/addresses")]
+    public async Task<IActionResult> GetAddresses(int userId)
+    {
+        var result = await _customerService.GetCustomerAddressesAsync(userId);
         return Ok(result);
     }
 }
