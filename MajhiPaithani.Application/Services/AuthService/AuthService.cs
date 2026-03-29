@@ -100,6 +100,14 @@ public class AuthService : IAuthService
 
         var role = user.IRoleId == 1 ? "Admin" : user.IRoleId == 2 ? "Seller" : user.IRoleId == 3 ? "Customer" : "";
 
+        var cartItemCount = 0;
+        if (user.IRoleId == 3)
+        {
+            var cart = await _context.Carts.FirstOrDefaultAsync(c => c.IUserId == user.IUserId && c.Status == "Active");
+            if (cart != null)
+                cartItemCount = await _context.CartItems.CountAsync(ci => ci.ICartId == cart.CartId);
+        }
+
         // Generate JWT Token
         var token = _jwtTokenService.GenerateToken(
             user.IUserId,
@@ -122,6 +130,7 @@ public class AuthService : IAuthService
             SellerId = seller?.ISellerId,
             Token = token,
             Message = "Login successful",
+            CartItemCount = cartItemCount,
             Address = userAddress == null ? null : new UserAddressResponse
             {
                 AddressId = userAddress.AddressId,

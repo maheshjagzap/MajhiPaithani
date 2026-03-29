@@ -8,6 +8,7 @@ namespace MajhiPaithani.Application.Models.Response
         public int Quantity { get; set; }
         public decimal PriceAtTime { get; set; }
         public string Message { get; set; } = string.Empty;
+        public int CartItemCount { get; set; }
     }
 
     public class CartProductImageDto
