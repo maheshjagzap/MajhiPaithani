@@ -42,4 +42,11 @@ public class CustomerProfileController : ControllerBase
         var result = await _customerService.GetCustomerAddressesAsync(userId);
         return Ok(result);
     }
+
+    [HttpDelete("delete-address/{addressId}")]
+    public async Task<IActionResult> DeleteAddress(int addressId)
+    {
+        await _customerService.DeleteCustomerAddressAsync(addressId);
+        return Ok(new { Message = "Address deleted successfully" });
+    }
 }
