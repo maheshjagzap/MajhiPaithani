@@ -27,7 +27,7 @@ namespace MajhiPaithani.API.Endpoint
                     }
                 })
                 .WithName("GetDropdown")
-                .WithTags("Dropdown");
+                .WithTags("Dropdown");//
             }
         }
     
