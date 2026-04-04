@@ -2,6 +2,7 @@ using MajhiPaithani.API.Endpoint;
 using MajhiPaithani.API.Hubs;
 using MajhiPaithani.API.Middleware;
 using MajhiPaithani.Application.DataAccess;
+using MajhiPaithani.Application.Services;
 using MajhiPaithani.Application.Interfaces.IAuthService;
 using MajhiPaithani.Application.Interfaces.ISellerInserface;
 using MajhiPaithani.Application.Interfaces.ICartService;
@@ -42,6 +43,9 @@ services.AddScoped<GetSellerDashboardService>();
 services.AddScoped<GetSellerDashboardDataAccess>();
 services.AddScoped<AddproductimagedataAccess>();
 services.AddScoped<AddProductImageservice>();
+services.AddScoped<OrderDataAccess>();
+services.AddScoped<OrderService>();
+services.AddHttpClient();
 
 
 
@@ -172,6 +176,7 @@ Dropdown.Map(app);
 SaveData.Map(app);
 GetSellerDashboard.Map(app);
 UploadPoductimage.Map(app);
+OrderEndpoint.Map(app);
 
 
 if (app.Environment.IsDevelopment())
