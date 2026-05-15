@@ -117,21 +117,8 @@ builder.Services.AddSignalR(options =>
 // "SignalRPolicy" — used only by SignalR hub (requires specific origins + credentials)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader());
-
-    options.AddPolicy("SignalRPolicy", policy =>
-        policy.WithOrigins(
-                "https://localhost:7006",
-                "http://localhost:7006",
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:4200",
-                "http://127.0.0.1:5500",
-                "https://mazipaithaniadmin.onrender.com"
-              )
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("https://mazipaithaniadmin.onrender.com")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
@@ -158,7 +145,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 // 2nd: Security & Swagger
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 app.UseSwagger();
 app.UseSwaggerUI();
 

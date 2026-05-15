@@ -39,7 +39,7 @@ jobs:
     - name: 🔐 Test SSH Connection
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 15.207.106.250
+        host: 13.127.230.243
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
@@ -51,7 +51,7 @@ jobs:
     - name: 🛑 Stop IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 15.207.106.250
+        host: 13.127.230.243
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
@@ -61,7 +61,7 @@ jobs:
     # - name: 🧹 Clean IIS Folder
     #   uses: appleboy/ssh-action@v1.0.0
     #   with:
-    #     host: 15.207.106.250
+    #     host: 13.127.230.243
     #     username: Administrator
     #     key: ${{ secrets.EC2_SSH_KEY }}
     #     script: |
@@ -71,7 +71,7 @@ jobs:
     - name: 🚀 Upload Files to EC2
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: 15.207.106.250
+        host: 13.127.230.243
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "publish/*"
@@ -82,7 +82,7 @@ jobs:
     - name: 🔍 Verify Deployment
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 15.207.106.250
+        host: 13.127.230.243
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
@@ -92,7 +92,7 @@ jobs:
     - name: ▶️ Start IIS App Pool
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 15.207.106.250
+        host: 13.127.230.243
         username: Administrator
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
